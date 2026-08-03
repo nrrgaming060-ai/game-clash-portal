@@ -24,6 +24,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminRequestsRouteImport } from './routes/admin.requests'
 import { Route as AdminResultsRouteImport } from './routes/admin.results'
 import { Route as AdminTournamentsRouteImport } from './routes/admin.tournaments'
+import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as TournamentsIdRouteImport } from './routes/tournaments.$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -101,6 +102,11 @@ const AdminTournamentsRoute = AdminTournamentsRouteImport.update({
   path: '/tournaments',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRoute,
+} as any)
 const TournamentsIdRoute = TournamentsIdRouteImport.update({
   id: '/tournaments/$id',
   path: '/tournaments/$id',
@@ -122,6 +128,7 @@ export interface FileRoutesByFullPath {
   '/admin/requests': typeof AdminRequestsRoute
   '/admin/results': typeof AdminResultsRoute
   '/admin/tournaments': typeof AdminTournamentsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/tournaments/$id': typeof TournamentsIdRoute
   '/admin/': typeof AdminIndexRoute
 }
@@ -139,6 +146,7 @@ export interface FileRoutesByTo {
   '/admin/requests': typeof AdminRequestsRoute
   '/admin/results': typeof AdminResultsRoute
   '/admin/tournaments': typeof AdminTournamentsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/tournaments/$id': typeof TournamentsIdRoute
   '/admin': typeof AdminIndexRoute
 }
@@ -158,6 +166,7 @@ export interface FileRoutesById {
   '/admin/requests': typeof AdminRequestsRoute
   '/admin/results': typeof AdminResultsRoute
   '/admin/tournaments': typeof AdminTournamentsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/tournaments/$id': typeof TournamentsIdRoute
   '/admin/': typeof AdminIndexRoute
 }
@@ -178,6 +187,7 @@ export interface FileRouteTypes {
     | '/admin/requests'
     | '/admin/results'
     | '/admin/tournaments'
+    | '/admin/users'
     | '/tournaments/$id'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
@@ -195,6 +205,7 @@ export interface FileRouteTypes {
     | '/admin/requests'
     | '/admin/results'
     | '/admin/tournaments'
+    | '/admin/users'
     | '/tournaments/$id'
     | '/admin'
   id:
@@ -213,6 +224,7 @@ export interface FileRouteTypes {
     | '/admin/requests'
     | '/admin/results'
     | '/admin/tournaments'
+    | '/admin/users'
     | '/tournaments/$id'
     | '/admin/'
   fileRoutesById: FileRoutesById
@@ -339,6 +351,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminTournamentsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/tournaments/$id': {
       id: '/tournaments/$id'
       path: '/tournaments/$id'
@@ -353,6 +372,7 @@ interface AdminRouteChildren {
   AdminRequestsRoute: typeof AdminRequestsRoute
   AdminResultsRoute: typeof AdminResultsRoute
   AdminTournamentsRoute: typeof AdminTournamentsRoute
+  AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
@@ -360,6 +380,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminRequestsRoute: AdminRequestsRoute,
   AdminResultsRoute: AdminResultsRoute,
   AdminTournamentsRoute: AdminTournamentsRoute,
+  AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 
