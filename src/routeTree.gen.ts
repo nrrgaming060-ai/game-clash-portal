@@ -21,6 +21,7 @@ import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as ReferRouteImport } from './routes/refer'
 import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminNotificationsRouteImport } from './routes/admin.notifications'
 import { Route as AdminRequestsRouteImport } from './routes/admin.requests'
 import { Route as AdminResultsRouteImport } from './routes/admin.results'
 import { Route as AdminTournamentsRouteImport } from './routes/admin.tournaments'
@@ -87,6 +88,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminNotificationsRoute = AdminNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminRequestsRoute = AdminRequestsRouteImport.update({
   id: '/requests',
   path: '/requests',
@@ -125,6 +131,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof OnboardingRoute
   '/refer': typeof ReferRoute
   '/wallet': typeof WalletRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/requests': typeof AdminRequestsRoute
   '/admin/results': typeof AdminResultsRoute
   '/admin/tournaments': typeof AdminTournamentsRoute
@@ -143,6 +150,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingRoute
   '/refer': typeof ReferRoute
   '/wallet': typeof WalletRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/requests': typeof AdminRequestsRoute
   '/admin/results': typeof AdminResultsRoute
   '/admin/tournaments': typeof AdminTournamentsRoute
@@ -163,6 +171,7 @@ export interface FileRoutesById {
   '/onboarding': typeof OnboardingRoute
   '/refer': typeof ReferRoute
   '/wallet': typeof WalletRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/requests': typeof AdminRequestsRoute
   '/admin/results': typeof AdminResultsRoute
   '/admin/tournaments': typeof AdminTournamentsRoute
@@ -184,6 +193,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/refer'
     | '/wallet'
+    | '/admin/notifications'
     | '/admin/requests'
     | '/admin/results'
     | '/admin/tournaments'
@@ -202,6 +212,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/refer'
     | '/wallet'
+    | '/admin/notifications'
     | '/admin/requests'
     | '/admin/results'
     | '/admin/tournaments'
@@ -221,6 +232,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/refer'
     | '/wallet'
+    | '/admin/notifications'
     | '/admin/requests'
     | '/admin/results'
     | '/admin/tournaments'
@@ -330,6 +342,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/notifications': {
+      id: '/admin/notifications'
+      path: '/notifications'
+      fullPath: '/admin/notifications'
+      preLoaderRoute: typeof AdminNotificationsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/requests': {
       id: '/admin/requests'
       path: '/requests'
@@ -369,6 +388,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteChildren {
+  AdminNotificationsRoute: typeof AdminNotificationsRoute
   AdminRequestsRoute: typeof AdminRequestsRoute
   AdminResultsRoute: typeof AdminResultsRoute
   AdminTournamentsRoute: typeof AdminTournamentsRoute
@@ -377,6 +397,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminNotificationsRoute: AdminNotificationsRoute,
   AdminRequestsRoute: AdminRequestsRoute,
   AdminResultsRoute: AdminResultsRoute,
   AdminTournamentsRoute: AdminTournamentsRoute,
