@@ -10,33 +10,250 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as HomeRouteImport } from './routes/home'
+import { Route as LeaderboardRouteImport } from './routes/leaderboard'
+import { Route as MenuRouteImport } from './routes/menu'
+import { Route as MyMatchesRouteImport } from './routes/my-matches'
+import { Route as NotificationsRouteImport } from './routes/notifications'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as ReferRouteImport } from './routes/refer'
+import { Route as WalletRouteImport } from './routes/wallet'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminNotificationsRouteImport } from './routes/admin.notifications'
+import { Route as AdminRequestsRouteImport } from './routes/admin.requests'
+import { Route as AdminResultsRouteImport } from './routes/admin.results'
+import { Route as AdminTournamentsRouteImport } from './routes/admin.tournaments'
+import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as TournamentsIdRouteImport } from './routes/tournaments.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HomeRoute = HomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LeaderboardRoute = LeaderboardRouteImport.update({
+  id: '/leaderboard',
+  path: '/leaderboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MenuRoute = MenuRouteImport.update({
+  id: '/menu',
+  path: '/menu',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MyMatchesRoute = MyMatchesRouteImport.update({
+  id: '/my-matches',
+  path: '/my-matches',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotificationsRoute = NotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReferRoute = ReferRouteImport.update({
+  id: '/refer',
+  path: '/refer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WalletRoute = WalletRouteImport.update({
+  id: '/wallet',
+  path: '/wallet',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminNotificationsRoute = AdminNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminRequestsRoute = AdminRequestsRouteImport.update({
+  id: '/requests',
+  path: '/requests',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminResultsRoute = AdminResultsRouteImport.update({
+  id: '/results',
+  path: '/results',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminTournamentsRoute = AdminTournamentsRouteImport.update({
+  id: '/tournaments',
+  path: '/tournaments',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRoute,
+} as any)
+const TournamentsIdRoute = TournamentsIdRouteImport.update({
+  id: '/tournaments/$id',
+  path: '/tournaments/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/home': typeof HomeRoute
+  '/leaderboard': typeof LeaderboardRoute
+  '/menu': typeof MenuRoute
+  '/my-matches': typeof MyMatchesRoute
+  '/notifications': typeof NotificationsRoute
+  '/onboarding': typeof OnboardingRoute
+  '/refer': typeof ReferRoute
+  '/wallet': typeof WalletRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
+  '/admin/requests': typeof AdminRequestsRoute
+  '/admin/results': typeof AdminResultsRoute
+  '/admin/tournaments': typeof AdminTournamentsRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/tournaments/$id': typeof TournamentsIdRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/home': typeof HomeRoute
+  '/leaderboard': typeof LeaderboardRoute
+  '/menu': typeof MenuRoute
+  '/my-matches': typeof MyMatchesRoute
+  '/notifications': typeof NotificationsRoute
+  '/onboarding': typeof OnboardingRoute
+  '/refer': typeof ReferRoute
+  '/wallet': typeof WalletRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
+  '/admin/requests': typeof AdminRequestsRoute
+  '/admin/results': typeof AdminResultsRoute
+  '/admin/tournaments': typeof AdminTournamentsRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/tournaments/$id': typeof TournamentsIdRoute
+  '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/home': typeof HomeRoute
+  '/leaderboard': typeof LeaderboardRoute
+  '/menu': typeof MenuRoute
+  '/my-matches': typeof MyMatchesRoute
+  '/notifications': typeof NotificationsRoute
+  '/onboarding': typeof OnboardingRoute
+  '/refer': typeof ReferRoute
+  '/wallet': typeof WalletRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
+  '/admin/requests': typeof AdminRequestsRoute
+  '/admin/results': typeof AdminResultsRoute
+  '/admin/tournaments': typeof AdminTournamentsRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/tournaments/$id': typeof TournamentsIdRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/auth'
+    | '/home'
+    | '/leaderboard'
+    | '/menu'
+    | '/my-matches'
+    | '/notifications'
+    | '/onboarding'
+    | '/refer'
+    | '/wallet'
+    | '/admin/notifications'
+    | '/admin/requests'
+    | '/admin/results'
+    | '/admin/tournaments'
+    | '/admin/users'
+    | '/tournaments/$id'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/home'
+    | '/leaderboard'
+    | '/menu'
+    | '/my-matches'
+    | '/notifications'
+    | '/onboarding'
+    | '/refer'
+    | '/wallet'
+    | '/admin/notifications'
+    | '/admin/requests'
+    | '/admin/results'
+    | '/admin/tournaments'
+    | '/admin/users'
+    | '/tournaments/$id'
+    | '/admin'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/auth'
+    | '/home'
+    | '/leaderboard'
+    | '/menu'
+    | '/my-matches'
+    | '/notifications'
+    | '/onboarding'
+    | '/refer'
+    | '/wallet'
+    | '/admin/notifications'
+    | '/admin/requests'
+    | '/admin/results'
+    | '/admin/tournaments'
+    | '/admin/users'
+    | '/tournaments/$id'
+    | '/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  HomeRoute: typeof HomeRoute
+  LeaderboardRoute: typeof LeaderboardRoute
+  MenuRoute: typeof MenuRoute
+  MyMatchesRoute: typeof MyMatchesRoute
+  NotificationsRoute: typeof NotificationsRoute
+  OnboardingRoute: typeof OnboardingRoute
+  ReferRoute: typeof ReferRoute
+  WalletRoute: typeof WalletRoute
+  TournamentsIdRoute: typeof TournamentsIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,22 +265,162 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/home': {
+      id: '/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof HomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/leaderboard': {
+      id: '/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/leaderboard'
+      preLoaderRoute: typeof LeaderboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/menu': {
+      id: '/menu'
+      path: '/menu'
+      fullPath: '/menu'
+      preLoaderRoute: typeof MenuRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/my-matches': {
+      id: '/my-matches'
+      path: '/my-matches'
+      fullPath: '/my-matches'
+      preLoaderRoute: typeof MyMatchesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notifications': {
+      id: '/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof NotificationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/refer': {
+      id: '/refer'
+      path: '/refer'
+      fullPath: '/refer'
+      preLoaderRoute: typeof ReferRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wallet': {
+      id: '/wallet'
+      path: '/wallet'
+      fullPath: '/wallet'
+      preLoaderRoute: typeof WalletRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/notifications': {
+      id: '/admin/notifications'
+      path: '/notifications'
+      fullPath: '/admin/notifications'
+      preLoaderRoute: typeof AdminNotificationsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/requests': {
+      id: '/admin/requests'
+      path: '/requests'
+      fullPath: '/admin/requests'
+      preLoaderRoute: typeof AdminRequestsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/results': {
+      id: '/admin/results'
+      path: '/results'
+      fullPath: '/admin/results'
+      preLoaderRoute: typeof AdminResultsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/tournaments': {
+      id: '/admin/tournaments'
+      path: '/tournaments'
+      fullPath: '/admin/tournaments'
+      preLoaderRoute: typeof AdminTournamentsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/tournaments/$id': {
+      id: '/tournaments/$id'
+      path: '/tournaments/$id'
+      fullPath: '/tournaments/$id'
+      preLoaderRoute: typeof TournamentsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface AdminRouteChildren {
+  AdminNotificationsRoute: typeof AdminNotificationsRoute
+  AdminRequestsRoute: typeof AdminRequestsRoute
+  AdminResultsRoute: typeof AdminResultsRoute
+  AdminTournamentsRoute: typeof AdminTournamentsRoute
+  AdminUsersRoute: typeof AdminUsersRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminNotificationsRoute: AdminNotificationsRoute,
+  AdminRequestsRoute: AdminRequestsRoute,
+  AdminResultsRoute: AdminResultsRoute,
+  AdminTournamentsRoute: AdminTournamentsRoute,
+  AdminUsersRoute: AdminUsersRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRouteWithChildren,
+  AuthRoute: AuthRoute,
+  HomeRoute: HomeRoute,
+  LeaderboardRoute: LeaderboardRoute,
+  MenuRoute: MenuRoute,
+  MyMatchesRoute: MyMatchesRoute,
+  NotificationsRoute: NotificationsRoute,
+  OnboardingRoute: OnboardingRoute,
+  ReferRoute: ReferRoute,
+  WalletRoute: WalletRoute,
+  TournamentsIdRoute: TournamentsIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
