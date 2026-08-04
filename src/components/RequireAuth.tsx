@@ -1,7 +1,6 @@
 import { Navigate } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { FirebaseSetupNotice } from "@/components/FirebaseSetupNotice";
 import { CardSkeleton } from "@/components/States";
 
 function Loader() {
@@ -22,9 +21,8 @@ export function RequireAuth({
   requireProfile?: boolean;
   admin?: boolean;
 }) {
-  const { user, profile, loading, configured, isAdmin } = useAuth();
+  const { user, profile, loading, isAdmin } = useAuth();
 
-  if (!configured) return <FirebaseSetupNotice />;
   if (loading) return <Loader />;
   if (!user) return <Navigate to="/auth" replace />;
   if (requireProfile && profile && !profile.profileComplete)
