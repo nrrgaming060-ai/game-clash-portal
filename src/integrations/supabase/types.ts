@@ -14,16 +14,414 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      joined_players: {
+        Row: {
+          id: string
+          joined_at: string
+          kills: number
+          player_game_uid: string
+          points: number
+          rank: number
+          tournament_id: string
+          user_id: string
+          user_name: string
+        }
+        Insert: {
+          id?: string
+          joined_at?: string
+          kills?: number
+          player_game_uid?: string
+          points?: number
+          rank?: number
+          tournament_id: string
+          user_id: string
+          user_name?: string
+        }
+        Update: {
+          id?: string
+          joined_at?: string
+          kills?: number
+          player_game_uid?: string
+          points?: number
+          rank?: number
+          tournament_id?: string
+          user_id?: string
+          user_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "joined_players_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leaderboards: {
+        Row: {
+          avatar_url: string
+          id: string
+          matches_played: number
+          total_kills: number
+          total_points: number
+          user_id: string
+          user_name: string
+          wins: number
+        }
+        Insert: {
+          avatar_url?: string
+          id?: string
+          matches_played?: number
+          total_kills?: number
+          total_points?: number
+          user_id: string
+          user_name?: string
+          wins?: number
+        }
+        Update: {
+          avatar_url?: string
+          id?: string
+          matches_played?: number
+          total_kills?: number
+          total_points?: number
+          user_id?: string
+          user_name?: string
+          wins?: number
+        }
+        Relationships: []
+      }
+      money_requests: {
+        Row: {
+          account_ref: string
+          amount: number
+          created_at: string
+          handled_at: string | null
+          id: string
+          kind: string
+          method: string
+          status: string
+          user_id: string
+          user_name: string
+        }
+        Insert: {
+          account_ref?: string
+          amount?: number
+          created_at?: string
+          handled_at?: string | null
+          id?: string
+          kind: string
+          method?: string
+          status?: string
+          user_id: string
+          user_name?: string
+        }
+        Update: {
+          account_ref?: string
+          amount?: number
+          created_at?: string
+          handled_at?: string | null
+          id?: string
+          kind?: string
+          method?: string
+          status?: string
+          user_id?: string
+          user_name?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          target_audience: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message?: string
+          target_audience?: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          target_audience?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string
+          banned: boolean
+          deposit_balance: number
+          email: string
+          game_uid: string
+          id: string
+          joined_at: string
+          name: string
+          notify_matches: boolean
+          notify_promos: boolean
+          phone: string
+          profile_complete: boolean
+          referral_code: string
+          referred_by: string | null
+          win_balance: number
+        }
+        Insert: {
+          avatar_url?: string
+          banned?: boolean
+          deposit_balance?: number
+          email?: string
+          game_uid?: string
+          id: string
+          joined_at?: string
+          name?: string
+          notify_matches?: boolean
+          notify_promos?: boolean
+          phone?: string
+          profile_complete?: boolean
+          referral_code: string
+          referred_by?: string | null
+          win_balance?: number
+        }
+        Update: {
+          avatar_url?: string
+          banned?: boolean
+          deposit_balance?: number
+          email?: string
+          game_uid?: string
+          id?: string
+          joined_at?: string
+          name?: string
+          notify_matches?: boolean
+          notify_promos?: boolean
+          phone?: string
+          profile_complete?: boolean
+          referral_code?: string
+          referred_by?: string | null
+          win_balance?: number
+        }
+        Relationships: []
+      }
+      rooms: {
+        Row: {
+          is_unlocked: boolean
+          room_id: string
+          room_password: string
+          tournament_id: string
+          unlock_time: string | null
+        }
+        Insert: {
+          is_unlocked?: boolean
+          room_id?: string
+          room_password?: string
+          tournament_id: string
+          unlock_time?: string | null
+        }
+        Update: {
+          is_unlocked?: boolean
+          room_id?: string
+          room_password?: string
+          tournament_id?: string
+          unlock_time?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rooms_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: true
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tournaments: {
+        Row: {
+          banner_url: string
+          category: string
+          created_at: string
+          entry_fee: number
+          featured: boolean
+          game_name: string
+          id: string
+          joined_slots: number
+          map: string
+          per_kill: number
+          prize_pool: number
+          rules: string[]
+          start_time: string
+          status: string
+          title: string
+          total_slots: number
+        }
+        Insert: {
+          banner_url?: string
+          category?: string
+          created_at?: string
+          entry_fee?: number
+          featured?: boolean
+          game_name?: string
+          id?: string
+          joined_slots?: number
+          map?: string
+          per_kill?: number
+          prize_pool?: number
+          rules?: string[]
+          start_time?: string
+          status?: string
+          title: string
+          total_slots?: number
+        }
+        Update: {
+          banner_url?: string
+          category?: string
+          created_at?: string
+          entry_fee?: number
+          featured?: boolean
+          game_name?: string
+          id?: string
+          joined_slots?: number
+          map?: string
+          per_kill?: number
+          prize_pool?: number
+          rules?: string[]
+          start_time?: string
+          status?: string
+          title?: string
+          total_slots?: number
+        }
+        Relationships: []
+      }
+      transactions: {
+        Row: {
+          amount: number
+          balance_after: number
+          created_at: string
+          id: string
+          note: string
+          type: string
+          user_id: string
+          wallet: string
+        }
+        Insert: {
+          amount?: number
+          balance_after?: number
+          created_at?: string
+          id?: string
+          note?: string
+          type: string
+          user_id: string
+          wallet: string
+        }
+        Update: {
+          amount?: number
+          balance_after?: number
+          created_at?: string
+          id?: string
+          note?: string
+          type?: string
+          user_id?: string
+          wallet?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      admin_list_users: {
+        Args: never
+        Returns: {
+          avatar_url: string
+          banned: boolean
+          deposit_balance: number
+          email: string
+          game_uid: string
+          id: string
+          joined_at: string
+          name: string
+          notify_matches: boolean
+          notify_promos: boolean
+          phone: string
+          profile_complete: boolean
+          referral_code: string
+          referred_by: string | null
+          win_balance: number
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      admin_user_ids: {
+        Args: never
+        Returns: {
+          user_id: string
+        }[]
+      }
+      apply_referral: { Args: { p_code: string }; Returns: undefined }
+      ensure_profile: {
+        Args: { p_avatar: string; p_email: string; p_name: string }
+        Returns: undefined
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      join_tournament: { Args: { p_tournament_id: string }; Returns: undefined }
+      resolve_request: {
+        Args: { p_approve: boolean; p_request_id: string }
+        Returns: undefined
+      }
+      set_user_role: {
+        Args: { p_admin: boolean; p_user_id: string }
+        Returns: undefined
+      }
+      submit_result: {
+        Args: {
+          p_join_id: string
+          p_kills: number
+          p_points: number
+          p_prize: number
+          p_rank: number
+        }
+        Returns: undefined
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +548,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const
