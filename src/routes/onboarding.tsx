@@ -80,10 +80,10 @@ function Onboarding() {
     if (!user) return;
     setBusy(true);
     try {
-      await updateProfile(user.uid, { ...parsed.data, profileComplete: true });
+      await updateProfile(user.id, { ...parsed.data, profileComplete: true });
       if (form.referral.trim()) {
         try {
-          await applyReferral(user.uid, form.referral.trim().toLowerCase());
+          await applyReferral(user.id, form.referral.trim().toLowerCase());
           toast.success("Referral bonus added");
         } catch (err) {
           toast.error((err as Error).message);

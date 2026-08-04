@@ -6,18 +6,9 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import {
-  GoogleAuthProvider,
-  createUserWithEmailAndPassword,
-  onAuthStateChanged,
-  sendPasswordResetEmail,
-  signInWithEmailAndPassword,
-  signInWithPopup,
-  signOut,
-  updateProfile as updateAuthProfile,
-  type User,
-} from "firebase/auth";
-import { getFirebaseAuth, isFirebaseConfigured } from "@/lib/firebase";
+import type { Session, User } from "@supabase/supabase-js";
+import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable/index";
 import { createProfileIfMissing, watchProfile } from "@/services/db";
 import type { UserProfile } from "@/lib/types";
 
@@ -36,41 +27,48 @@ interface AuthValue {
 
 const AuthContext = createContext<AuthValue | null>(null);
 
+function check<T extends { error: { message: string } | null }>(res: T) {
+  if (res.error) throw new Error(res.error.message);
+  return res;
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!isFirebaseConfigured) {
-      setLoading(false);
-      return;
-    }
-    return onAuthStateChanged(getFirebaseAuth(), async (u) => {
-      setUser(u);
-      if (!u) {
+    const apply = (session: Session | null) => {
+      setUser(session?.user ?? null);
+      if (!session?.user) {
         setProfile(null);
         setLoading(false);
       }
-    });
+    };
+    void supabase.auth.getSession().then(({ data }) => apply(data.session));
+    const { data } = supabase.auth.onAuthStateChange((_e, session) => apply(session));
+    return () => data.subscription.unsubscribe();
   }, []);
 
   useEffect(() => {
-    if (!user || !isFirebaseConfigured) return;
+    if (!user) return;
     let cancelled = false;
     let unsub: (() => void) | undefined;
-    (async () => {
+    void (async () => {
       try {
-        await createProfileIfMissing(user.uid, {
-          name: user.displayName ?? user.email?.split("@")[0] ?? "Player",
+        await createProfileIfMissing(user.id, {
+          name:
+            (user.user_metadata?.["full_name"] as string | undefined) ??
+            user.email?.split("@")[0] ??
+            "Player",
           email: user.email ?? "",
-          avatarUrl: user.photoURL ?? "",
+          avatarUrl: (user.user_metadata?.["avatar_url"] as string | undefined) ?? "",
         });
       } catch {
-        /* rules may block creation; the listener below still reports state */
+        /* the listener below still reports the current state */
       }
       if (cancelled) return;
-      unsub = watchProfile(user.uid, (p) => {
+      unsub = watchProfile(user.id, (p) => {
         setProfile(p);
         setLoading(false);
       });
@@ -86,24 +84,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       profile,
       loading,
-      configured: isFirebaseConfigured,
+      configured: true,
       isAdmin: profile?.role === "admin",
       signInGoogle: async () => {
-        await signInWithPopup(getFirebaseAuth(), new GoogleAuthProvider());
+        const result = await lovable.auth.signInWithOAuth("google", {
+          redirect_uri: window.location.origin,
+        });
+        if (result.error) throw result.error;
       },
       signInEmail: async (email, password) => {
-        await signInWithEmailAndPassword(getFirebaseAuth(), email, password);
+        check(await supabase.auth.signInWithPassword({ email, password }));
       },
       signUpEmail: async (name, email, password) => {
-        const cred = await createUserWithEmailAndPassword(getFirebaseAuth(), email, password);
-        await updateAuthProfile(cred.user, { displayName: name });
-        await createProfileIfMissing(cred.user.uid, { name, email });
+        check(
+          await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+              emailRedirectTo: window.location.origin,
+              data: { full_name: name },
+            },
+          }),
+        );
       },
       resetPassword: async (email) => {
-        await sendPasswordResetEmail(getFirebaseAuth(), email);
+        check(
+          await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: `${window.location.origin}/auth`,
+          }),
+        );
       },
       logout: async () => {
-        await signOut(getFirebaseAuth());
+        await supabase.auth.signOut();
       },
     }),
     [user, profile, loading],

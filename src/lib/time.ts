@@ -1,16 +1,13 @@
 import { useEffect, useState } from "react";
-import type { Timestamp } from "firebase/firestore";
 
-export function tsToDate(ts?: Timestamp | null): Date | null {
+/** Accepts an ISO string (Postgres) or anything date-like. */
+export function tsToDate(ts?: string | Date | null): Date | null {
   if (!ts) return null;
-  // Firestore Timestamp or a plain {seconds} object after SSR serialization
-  const anyTs = ts as unknown as { toDate?: () => Date; seconds?: number };
-  if (typeof anyTs.toDate === "function") return anyTs.toDate();
-  if (typeof anyTs.seconds === "number") return new Date(anyTs.seconds * 1000);
-  return null;
+  const d = ts instanceof Date ? ts : new Date(ts);
+  return Number.isNaN(d.getTime()) ? null : d;
 }
 
-export function formatDateTime(ts?: Timestamp | null): string {
+export function formatDateTime(ts?: string | Date | null): string {
   const d = tsToDate(ts);
   if (!d) return "—";
   return d.toLocaleString(undefined, {

@@ -1,4 +1,5 @@
-import type { Timestamp } from "firebase/firestore";
+/** ISO timestamp string coming back from the database. */
+export type Ts = string | null;
 
 export type Role = "user" | "admin";
 
@@ -17,7 +18,7 @@ export interface UserProfile {
   phone: string;
   gameUid: string;
   avatarUrl: string;
-  joinedAt: Timestamp | null;
+  joinedAt: Ts;
   role: Role;
   banned?: boolean;
   referralCode: string;
@@ -42,10 +43,10 @@ export interface Tournament {
   rules: string[];
   totalSlots: number;
   joinedSlots: number;
-  startTime: Timestamp;
+  startTime: string;
   status: TournamentStatus;
   featured?: boolean;
-  createdAt?: Timestamp;
+  createdAt?: Ts;
 }
 
 export interface JoinedPlayer {
@@ -54,7 +55,7 @@ export interface JoinedPlayer {
   userId: string;
   userName: string;
   playerGameUid: string;
-  joinedAt: Timestamp | null;
+  joinedAt: Ts;
   kills?: number;
   rank?: number;
   points?: number;
@@ -65,7 +66,7 @@ export interface Room {
   roomId: string;
   roomPassword: string;
   isUnlocked: boolean;
-  unlockTime: Timestamp | null;
+  unlockTime: Ts;
 }
 
 export interface LeaderboardEntry {
@@ -83,7 +84,7 @@ export interface AppNotification {
   id: string;
   title: string;
   message: string;
-  createdAt: Timestamp | null;
+  createdAt: Ts;
   targetAudience: string; // "all" | tournament id
 }
 
@@ -98,7 +99,7 @@ export interface Transaction {
   amount: number;
   balanceAfter: number;
   note: string;
-  createdAt: Timestamp | null;
+  createdAt: Ts;
 }
 
 export type RequestStatus = "pending" | "approved" | "rejected";
@@ -112,6 +113,6 @@ export interface MoneyRequest {
   method: string;
   accountRef: string;
   status: RequestStatus;
-  createdAt: Timestamp | null;
-  handledAt?: Timestamp | null;
+  createdAt: Ts;
+  handledAt?: Ts;
 }
