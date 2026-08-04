@@ -60,7 +60,7 @@ function AuthPage() {
       await fn();
       navigate({ to: "/home" });
     } catch (e) {
-      toast.error(firebaseMessage(e));
+      toast.error(authMessage(e));
     } finally {
       setBusy(false);
     }
@@ -149,7 +149,7 @@ function AuthPage() {
                       await resetPassword(email);
                       toast.success("Password reset link sent");
                     } catch (e) {
-                      toast.error(firebaseMessage(e));
+                      toast.error(authMessage(e));
                     }
                   }}
                 >
