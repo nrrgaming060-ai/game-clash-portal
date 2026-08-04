@@ -33,23 +33,18 @@ const signUpSchema = signInSchema.extend({
   name: z.string().trim().min(2, "Name is too short").max(50),
 });
 
-function firebaseMessage(e: unknown) {
-  const code = (e as { code?: string })?.code ?? "";
-  const map: Record<string, string> = {
-    "auth/invalid-credential": "Email or password is incorrect.",
-    "auth/user-not-found": "No account found with that email.",
-    "auth/wrong-password": "Email or password is incorrect.",
-    "auth/email-already-in-use": "That email is already registered.",
-    "auth/weak-password": "Choose a stronger password.",
-    "auth/popup-closed-by-user": "Google sign-in was cancelled.",
-    "auth/unauthorized-domain": "Add this preview domain to Firebase Auth authorised domains.",
-    "auth/operation-not-allowed": "Enable this sign-in method in the Firebase console.",
-  };
-  return map[code] ?? (e as Error)?.message ?? "Something went wrong. Try again.";
+function authMessage(e: unknown) {
+  const raw = (e as Error)?.message ?? "";
+  if (/invalid login credentials/i.test(raw)) return "Email or password is incorrect.";
+  if (/already registered|already exists/i.test(raw)) return "That email is already registered.";
+  if (/password should be/i.test(raw)) return "Choose a stronger password.";
+  if (/email not confirmed/i.test(raw)) return "Confirm your email, then sign in.";
+  return raw || "Something went wrong. Try again.";
 }
 
 function AuthPage() {
-  const { user, configured, signInGoogle, signInEmail, signUpEmail, resetPassword } = useAuth();
+  const { user, signInGoogle, signInEmail, signUpEmail, resetPassword } = useAuth();
+
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", password: "" });
