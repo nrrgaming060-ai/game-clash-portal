@@ -10,7 +10,7 @@ import type {
   UserProfile,
 } from "@/lib/types";
 
-type Row = Record<string, any>;
+type Row = any;
 type Unsub = () => void;
 
 /** Kept for screens that build a start time from a Date. */
