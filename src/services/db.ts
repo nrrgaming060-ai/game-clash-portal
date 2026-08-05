@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import type {
   AppNotification,
+  Advertisement,
   JoinedPlayer,
   LeaderboardEntry,
   MoneyRequest,
@@ -154,6 +155,19 @@ const toNotification = (r: Row): AppNotification => ({
   message: r.message,
   createdAt: r.created_at,
   targetAudience: r.target_audience,
+});
+
+const toAdvertisement = (r: Row): Advertisement => ({
+  id: r.id,
+  title: r.title,
+  imageUrl: r.image_url,
+  linkUrl: r.link_url,
+  placement: r.placement,
+  startDate: r.start_date,
+  endDate: r.end_date,
+  active: r.active,
+  createdAt: r.created_at,
+  updatedAt: r.updated_at,
 });
 
 /* ---------------------------------- users --------------------------------- */
@@ -430,5 +444,50 @@ export async function broadcast(data: Omit<AppNotification, "id" | "createdAt">)
     message: data.message,
     target_audience: data.targetAudience,
   } as never);
+  err(error);
+}
+
+/* ----------------------------- advertisements ---------------------------- */
+
+export function watchAdvertisements(cb: (ads: Advertisement[]) => void): Unsub {
+  return live("advertisements", async () => {
+    const { data, error } = await supabase
+      .from("advertisements")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (error) return cb([]);
+    cb((data ?? []).map(toAdvertisement));
+  });
+}
+
+type AdvertisementInput = Omit<Advertisement, "id" | "createdAt" | "updatedAt">;
+
+function fromAdvertisement(ad: AdvertisementInput): Row {
+  return {
+    title: ad.title,
+    image_url: ad.imageUrl,
+    link_url: ad.linkUrl,
+    placement: ad.placement,
+    start_date: ad.startDate || null,
+    end_date: ad.endDate || null,
+    active: ad.active,
+  };
+}
+
+export async function createAdvertisement(ad: AdvertisementInput) {
+  const { error } = await supabase.from("advertisements").insert(fromAdvertisement(ad) as never);
+  err(error);
+}
+
+export async function updateAdvertisement(id: string, ad: AdvertisementInput) {
+  const { error } = await supabase
+    .from("advertisements")
+    .update(fromAdvertisement(ad) as never)
+    .eq("id", id);
+  err(error);
+}
+
+export async function deleteAdvertisement(id: string) {
+  const { error } = await supabase.from("advertisements").delete().eq("id", id);
   err(error);
 }
