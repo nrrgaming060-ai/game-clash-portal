@@ -21,6 +21,7 @@ import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as ReferRouteImport } from './routes/refer'
 import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminAdvertisementsRouteImport } from './routes/admin.advertisements'
 import { Route as AdminNotificationsRouteImport } from './routes/admin.notifications'
 import { Route as AdminRequestsRouteImport } from './routes/admin.requests'
 import { Route as AdminResultsRouteImport } from './routes/admin.results'
@@ -88,6 +89,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminAdvertisementsRoute = AdminAdvertisementsRouteImport.update({
+  id: '/advertisements',
+  path: '/advertisements',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminNotificationsRoute = AdminNotificationsRouteImport.update({
   id: '/notifications',
   path: '/notifications',
@@ -131,6 +137,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof OnboardingRoute
   '/refer': typeof ReferRoute
   '/wallet': typeof WalletRoute
+  '/admin/advertisements': typeof AdminAdvertisementsRoute
   '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/requests': typeof AdminRequestsRoute
   '/admin/results': typeof AdminResultsRoute
@@ -150,6 +157,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingRoute
   '/refer': typeof ReferRoute
   '/wallet': typeof WalletRoute
+  '/admin/advertisements': typeof AdminAdvertisementsRoute
   '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/requests': typeof AdminRequestsRoute
   '/admin/results': typeof AdminResultsRoute
@@ -171,6 +179,7 @@ export interface FileRoutesById {
   '/onboarding': typeof OnboardingRoute
   '/refer': typeof ReferRoute
   '/wallet': typeof WalletRoute
+  '/admin/advertisements': typeof AdminAdvertisementsRoute
   '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/requests': typeof AdminRequestsRoute
   '/admin/results': typeof AdminResultsRoute
@@ -193,6 +202,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/refer'
     | '/wallet'
+    | '/admin/advertisements'
     | '/admin/notifications'
     | '/admin/requests'
     | '/admin/results'
@@ -212,6 +222,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/refer'
     | '/wallet'
+    | '/admin/advertisements'
     | '/admin/notifications'
     | '/admin/requests'
     | '/admin/results'
@@ -232,6 +243,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/refer'
     | '/wallet'
+    | '/admin/advertisements'
     | '/admin/notifications'
     | '/admin/requests'
     | '/admin/results'
@@ -342,6 +354,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/advertisements': {
+      id: '/admin/advertisements'
+      path: '/advertisements'
+      fullPath: '/admin/advertisements'
+      preLoaderRoute: typeof AdminAdvertisementsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/notifications': {
       id: '/admin/notifications'
       path: '/notifications'
@@ -388,6 +407,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteChildren {
+  AdminAdvertisementsRoute: typeof AdminAdvertisementsRoute
   AdminNotificationsRoute: typeof AdminNotificationsRoute
   AdminRequestsRoute: typeof AdminRequestsRoute
   AdminResultsRoute: typeof AdminResultsRoute
@@ -397,6 +417,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminAdvertisementsRoute: AdminAdvertisementsRoute,
   AdminNotificationsRoute: AdminNotificationsRoute,
   AdminRequestsRoute: AdminRequestsRoute,
   AdminResultsRoute: AdminResultsRoute,

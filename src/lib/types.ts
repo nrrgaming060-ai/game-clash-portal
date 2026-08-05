@@ -88,6 +88,21 @@ export interface AppNotification {
   targetAudience: string; // "all" | tournament id
 }
 
+export type AdPlacement = "header" | "home" | "tournament";
+
+export interface Advertisement {
+  id: string;
+  title: string;
+  imageUrl: string;
+  linkUrl: string;
+  placement: AdPlacement;
+  startDate: string | null;
+  endDate: string | null;
+  active: boolean;
+  createdAt: Ts;
+  updatedAt: Ts;
+}
+
 export type TxType = "credit" | "debit";
 export type WalletKind = "deposit" | "win";
 
