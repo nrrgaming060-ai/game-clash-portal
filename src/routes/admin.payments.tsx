@@ -109,7 +109,7 @@ function AdminPayments() {
     }
     setBusy(true);
     try {
-      await savePaymentSettings({ ...form, ...parsed.data, id });
+      await savePaymentSettings({ ...form, ...parsed.data, ...(id ? { id } : {}) });
       toast.success("Payment details saved");
     } catch (e) {
       toast.error((e as Error).message);
