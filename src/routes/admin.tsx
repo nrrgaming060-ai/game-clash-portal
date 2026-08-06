@@ -1,5 +1,5 @@
 import { Link, Outlet, createFileRoute, useRouterState } from "@tanstack/react-router";
-import { BarChart3, Bell, Image, Swords, Trophy, Users, Wallet } from "lucide-react";
+import { BarChart3, Bell, Image, QrCode, Swords, Trophy, Users, Wallet } from "lucide-react";
 import { RequireAuth } from "@/components/RequireAuth";
 import { cn } from "@/lib/utils";
 
@@ -17,6 +17,7 @@ const NAV = [
   { to: "/admin/tournaments", label: "Tournaments", icon: Swords },
   { to: "/admin/results", label: "Results", icon: Trophy },
   { to: "/admin/requests", label: "Wallet", icon: Wallet },
+  { to: "/admin/payments", label: "Payments", icon: QrCode },
   { to: "/admin/users", label: "Users", icon: Users },
   { to: "/admin/notifications", label: "Notices", icon: Bell },
   { to: "/admin/advertisements", label: "Ads", icon: Image },
