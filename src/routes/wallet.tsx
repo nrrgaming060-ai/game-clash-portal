@@ -1,14 +1,28 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ArrowDownLeft, ArrowUpRight, Loader2, Wallet as WalletIcon } from "lucide-react";
+import {
+  ArrowDownLeft,
+  ArrowUpRight,
+  Copy,
+  Loader2,
+  Upload,
+  Wallet as WalletIcon,
+} from "lucide-react";
 import { z } from "zod";
 import { AppShell } from "@/components/AppShell";
 import { RequireAuth } from "@/components/RequireAuth";
 import { EmptyState, ListSkeleton } from "@/components/States";
 import { useAuth } from "@/contexts/AuthContext";
-import { createMoneyRequest, watchMyRequests, watchTransactions } from "@/services/db";
-import type { MoneyRequest, Transaction } from "@/lib/types";
+import {
+  createMoneyRequest,
+  upiDeepLink,
+  watchMyRequests,
+  watchPaymentSettings,
+  watchTransactions,
+} from "@/services/db";
+import { uploadFile } from "@/services/storage";
+import type { MoneyRequest, PaymentSettings, Transaction } from "@/lib/types";
 import { inr, formatDateTime } from "@/lib/time";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,8 +50,11 @@ export const Route = createFileRoute("/wallet")({
   ),
 });
 
-const amountSchema = z.coerce.number().min(10, "Minimum ₹10").max(100000, "Maximum ₹1,00,000");
 const refSchema = z.string().trim().min(4, "Enter a valid UPI ID or reference").max(80);
+const utrSchema = z
+  .string()
+  .trim()
+  .regex(/^[A-Za-z0-9]{8,24}$/, "Enter the UTR / reference number from your payment app");
 
 function StatusPill({ status }: { status: MoneyRequest["status"] }) {
   const cls =
@@ -53,9 +70,13 @@ function WalletPage() {
   const { profile } = useAuth();
   const [txs, setTxs] = useState<Transaction[] | null>(null);
   const [reqs, setReqs] = useState<MoneyRequest[]>([]);
+  const [pay, setPay] = useState<PaymentSettings | null>(null);
   const [busy, setBusy] = useState(false);
-  const [add, setAdd] = useState({ amount: "", ref: "" });
+  const [uploading, setUploading] = useState(false);
+  const [add, setAdd] = useState({ amount: "", utr: "", proofUrl: "" });
   const [out, setOut] = useState({ amount: "", ref: "" });
+
+  useEffect(() => watchPaymentSettings(setPay), []);
 
   useEffect(() => {
     if (!profile) return;
@@ -69,23 +90,79 @@ function WalletPage() {
 
   const deposit = profile?.depositBalance ?? 0;
   const win = profile?.winBalance ?? 0;
+  const min = pay?.minDeposit ?? 10;
+  const max = pay?.maxDeposit ?? 100000;
+  const amountSchema = z.coerce
+    .number()
+    .min(min, `Minimum ${inr(min)}`)
+    .max(max, `Maximum ${inr(max)}`);
+
+  const copyUpi = async () => {
+    if (!pay?.upiId) return;
+    try {
+      await navigator.clipboard.writeText(pay.upiId);
+      toast.success("UPI ID copied");
+    } catch {
+      toast.error("Could not copy — please type it manually");
+    }
+  };
+
+  const onProof = async (file: File | undefined) => {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error("Upload an image screenshot");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image must be under 5MB");
+      return;
+    }
+    setUploading(true);
+    try {
+      const url = await uploadFile("deposit-proofs", file);
+      setAdd((s) => ({ ...s, proofUrl: url }));
+      toast.success("Screenshot attached");
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const submit = async (kind: "deposit" | "withdrawal") => {
     if (!profile) return;
     const src = kind === "deposit" ? add : out;
     const amt = amountSchema.safeParse(src.amount);
-    const ref = refSchema.safeParse(src.ref);
     if (!amt.success) {
       toast.error(amt.error.issues[0]!.message);
       return;
     }
-    if (!ref.success) {
-      toast.error(ref.error.issues[0]!.message);
-      return;
-    }
-    if (kind === "withdrawal" && amt.data > win) {
-      toast.error("You can only withdraw from your winnings balance");
-      return;
+
+    let accountRef = "";
+    let utr = "";
+    if (kind === "deposit") {
+      if (!pay?.depositsEnabled) {
+        toast.error("Deposits are paused right now. Try again shortly.");
+        return;
+      }
+      const u = utrSchema.safeParse(add.utr);
+      if (!u.success) {
+        toast.error(u.error.issues[0]!.message);
+        return;
+      }
+      utr = u.data;
+      accountRef = pay.upiId;
+    } else {
+      const ref = refSchema.safeParse(out.ref);
+      if (!ref.success) {
+        toast.error(ref.error.issues[0]!.message);
+        return;
+      }
+      accountRef = ref.data;
+      if (amt.data > win) {
+        toast.error("You can only withdraw from your winnings balance");
+        return;
+      }
     }
 
     setBusy(true);
@@ -96,21 +173,29 @@ function WalletPage() {
         kind,
         amount: amt.data,
         method: "UPI",
-        accountRef: ref.data,
+        accountRef,
+        utr,
+        proofUrl: kind === "deposit" ? add.proofUrl : "",
       });
       toast.success(
         kind === "deposit"
-          ? "Deposit request submitted for review"
+          ? "Deposit submitted — it will be credited once verified"
           : "Withdrawal request submitted",
       );
-      if (kind === "deposit") setAdd({ amount: "", ref: "" });
+      if (kind === "deposit") setAdd({ amount: "", utr: "", proofUrl: "" });
       else setOut({ amount: "", ref: "" });
     } catch (e) {
-      toast.error((e as Error).message);
+      const msg = (e as Error).message;
+      toast.error(
+        msg.includes("duplicate") || msg.includes("unique")
+          ? "That transaction reference was already submitted"
+          : msg,
+      );
     } finally {
       setBusy(false);
     }
   };
+
 
   return (
     <AppShell title="Wallet" showWallet={false}>
