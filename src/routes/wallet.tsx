@@ -1,14 +1,28 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ArrowDownLeft, ArrowUpRight, Loader2, Wallet as WalletIcon } from "lucide-react";
+import {
+  ArrowDownLeft,
+  ArrowUpRight,
+  Copy,
+  Loader2,
+  Upload,
+  Wallet as WalletIcon,
+} from "lucide-react";
 import { z } from "zod";
 import { AppShell } from "@/components/AppShell";
 import { RequireAuth } from "@/components/RequireAuth";
 import { EmptyState, ListSkeleton } from "@/components/States";
 import { useAuth } from "@/contexts/AuthContext";
-import { createMoneyRequest, watchMyRequests, watchTransactions } from "@/services/db";
-import type { MoneyRequest, Transaction } from "@/lib/types";
+import {
+  createMoneyRequest,
+  upiDeepLink,
+  watchMyRequests,
+  watchPaymentSettings,
+  watchTransactions,
+} from "@/services/db";
+import { uploadFile } from "@/services/storage";
+import type { MoneyRequest, PaymentSettings, Transaction } from "@/lib/types";
 import { inr, formatDateTime } from "@/lib/time";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,8 +50,11 @@ export const Route = createFileRoute("/wallet")({
   ),
 });
 
-const amountSchema = z.coerce.number().min(10, "Minimum ₹10").max(100000, "Maximum ₹1,00,000");
 const refSchema = z.string().trim().min(4, "Enter a valid UPI ID or reference").max(80);
+const utrSchema = z
+  .string()
+  .trim()
+  .regex(/^[A-Za-z0-9]{8,24}$/, "Enter the UTR / reference number from your payment app");
 
 function StatusPill({ status }: { status: MoneyRequest["status"] }) {
   const cls =
@@ -53,9 +70,13 @@ function WalletPage() {
   const { profile } = useAuth();
   const [txs, setTxs] = useState<Transaction[] | null>(null);
   const [reqs, setReqs] = useState<MoneyRequest[]>([]);
+  const [pay, setPay] = useState<PaymentSettings | null>(null);
   const [busy, setBusy] = useState(false);
-  const [add, setAdd] = useState({ amount: "", ref: "" });
+  const [uploading, setUploading] = useState(false);
+  const [add, setAdd] = useState({ amount: "", utr: "", proofUrl: "" });
   const [out, setOut] = useState({ amount: "", ref: "" });
+
+  useEffect(() => watchPaymentSettings(setPay), []);
 
   useEffect(() => {
     if (!profile) return;
@@ -69,23 +90,79 @@ function WalletPage() {
 
   const deposit = profile?.depositBalance ?? 0;
   const win = profile?.winBalance ?? 0;
+  const min = pay?.minDeposit ?? 10;
+  const max = pay?.maxDeposit ?? 100000;
+  const amountSchema = z.coerce
+    .number()
+    .min(min, `Minimum ${inr(min)}`)
+    .max(max, `Maximum ${inr(max)}`);
+
+  const copyUpi = async () => {
+    if (!pay?.upiId) return;
+    try {
+      await navigator.clipboard.writeText(pay.upiId);
+      toast.success("UPI ID copied");
+    } catch {
+      toast.error("Could not copy — please type it manually");
+    }
+  };
+
+  const onProof = async (file: File | undefined) => {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error("Upload an image screenshot");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image must be under 5MB");
+      return;
+    }
+    setUploading(true);
+    try {
+      const url = await uploadFile("deposit-proofs", file);
+      setAdd((s) => ({ ...s, proofUrl: url }));
+      toast.success("Screenshot attached");
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const submit = async (kind: "deposit" | "withdrawal") => {
     if (!profile) return;
     const src = kind === "deposit" ? add : out;
     const amt = amountSchema.safeParse(src.amount);
-    const ref = refSchema.safeParse(src.ref);
     if (!amt.success) {
       toast.error(amt.error.issues[0]!.message);
       return;
     }
-    if (!ref.success) {
-      toast.error(ref.error.issues[0]!.message);
-      return;
-    }
-    if (kind === "withdrawal" && amt.data > win) {
-      toast.error("You can only withdraw from your winnings balance");
-      return;
+
+    let accountRef = "";
+    let utr = "";
+    if (kind === "deposit") {
+      if (!pay?.depositsEnabled) {
+        toast.error("Deposits are paused right now. Try again shortly.");
+        return;
+      }
+      const u = utrSchema.safeParse(add.utr);
+      if (!u.success) {
+        toast.error(u.error.issues[0]!.message);
+        return;
+      }
+      utr = u.data;
+      accountRef = pay.upiId;
+    } else {
+      const ref = refSchema.safeParse(out.ref);
+      if (!ref.success) {
+        toast.error(ref.error.issues[0]!.message);
+        return;
+      }
+      accountRef = ref.data;
+      if (amt.data > win) {
+        toast.error("You can only withdraw from your winnings balance");
+        return;
+      }
     }
 
     setBusy(true);
@@ -96,21 +173,29 @@ function WalletPage() {
         kind,
         amount: amt.data,
         method: "UPI",
-        accountRef: ref.data,
+        accountRef,
+        utr,
+        proofUrl: kind === "deposit" ? add.proofUrl : "",
       });
       toast.success(
         kind === "deposit"
-          ? "Deposit request submitted for review"
+          ? "Deposit submitted — it will be credited once verified"
           : "Withdrawal request submitted",
       );
-      if (kind === "deposit") setAdd({ amount: "", ref: "" });
+      if (kind === "deposit") setAdd({ amount: "", utr: "", proofUrl: "" });
       else setOut({ amount: "", ref: "" });
     } catch (e) {
-      toast.error((e as Error).message);
+      const msg = (e as Error).message;
+      toast.error(
+        msg.includes("duplicate") || msg.includes("unique")
+          ? "That transaction reference was already submitted"
+          : msg,
+      );
     } finally {
       setBusy(false);
     }
   };
+
 
   return (
     <AppShell title="Wallet" showWallet={false}>
@@ -143,6 +228,53 @@ function WalletPage() {
         </TabsList>
 
         <TabsContent value="add" className="space-y-3 pt-4">
+          {pay && !pay.depositsEnabled && (
+            <p className="rounded-xl border border-warning/40 bg-warning/10 p-3 text-sm text-warning">
+              Deposits are paused right now. Please check back soon.
+            </p>
+          )}
+
+          <div className="rounded-2xl border border-border bg-card p-4 text-center">
+            {pay?.qrUrl ? (
+              <img
+                src={pay.qrUrl}
+                alt="Scan this UPI QR code to pay ClashArena"
+                className="mx-auto h-44 w-44 rounded-xl bg-white object-contain p-2"
+                loading="lazy"
+              />
+            ) : (
+              <div className="mx-auto grid h-44 w-44 place-items-center rounded-xl border border-dashed border-border text-xs text-muted-foreground">
+                QR coming soon
+              </div>
+            )}
+            <p className="mt-3 font-display text-lg font-bold">{pay?.upiId || "Not set yet"}</p>
+            {pay?.payeeName && (
+              <p className="text-xs text-muted-foreground">{pay.payeeName}</p>
+            )}
+            <div className="mt-3 flex gap-2">
+              <Button
+                variant="outline"
+                className="flex-1"
+                disabled={!pay?.upiId}
+                onClick={() => void copyUpi()}
+              >
+                <Copy className="mr-2 h-4 w-4" /> Copy UPI ID
+              </Button>
+              <Button
+                asChild={!!pay?.upiId}
+                className="flex-1 bg-gradient-gold text-background"
+                disabled={!pay?.upiId}
+              >
+                {pay?.upiId ? (
+                  <a href={upiDeepLink(pay, Number(add.amount) || 0)}>Pay via UPI app</a>
+                ) : (
+                  <span>Pay via UPI app</span>
+                )}
+              </Button>
+            </div>
+            {pay?.note && <p className="mt-3 text-xs text-muted-foreground">{pay.note}</p>}
+          </div>
+
           <div className="flex gap-2">
             {[50, 100, 250, 500].map((v) => (
               <button
@@ -155,7 +287,7 @@ function WalletPage() {
             ))}
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="a1">Amount (₹)</Label>
+            <Label htmlFor="a1">Amount paid (₹)</Label>
             <Input
               id="a1"
               inputMode="numeric"
@@ -164,27 +296,45 @@ function WalletPage() {
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="a2">UPI ID / payment reference</Label>
+            <Label htmlFor="a2">UTR / transaction reference</Label>
             <Input
               id="a2"
-              value={add.ref}
-              onChange={(e) => setAdd((s) => ({ ...s, ref: e.target.value }))}
-              placeholder="yourname@upi"
-              maxLength={80}
+              value={add.utr}
+              onChange={(e) => setAdd((s) => ({ ...s, utr: e.target.value }))}
+              placeholder="12-digit UTR from your UPI app"
+              maxLength={24}
             />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Payment screenshot (optional)</Label>
+            <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-dashed border-border bg-surface-2 p-3 text-sm text-muted-foreground">
+              {uploading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Upload className="h-4 w-4" />
+              )}
+              {uploading ? "Uploading…" : add.proofUrl ? "Screenshot attached" : "Attach screenshot"}
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => void onProof(e.target.files?.[0])}
+              />
+            </label>
           </div>
           <Button
             className="w-full bg-gradient-primary"
-            disabled={busy}
+            disabled={busy || uploading || !pay?.depositsEnabled}
             onClick={() => void submit("deposit")}
           >
-            {busy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Submit deposit request
+            {busy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} I have paid — submit
           </Button>
           <p className="text-xs text-muted-foreground">
-            Deposits are verified by an admin and credited to your deposit balance, usually within
-            minutes.
+            Pay first, then submit the UTR. Once verified, the amount is credited to your deposit
+            balance automatically — usually within minutes.
           </p>
         </TabsContent>
+
 
         <TabsContent value="out" className="space-y-3 pt-4">
           <div className="space-y-1.5">

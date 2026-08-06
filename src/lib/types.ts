@@ -130,4 +130,17 @@ export interface MoneyRequest {
   status: RequestStatus;
   createdAt: Ts;
   handledAt?: Ts;
+  utr?: string;
+  proofUrl?: string;
+}
+
+export interface PaymentSettings {
+  id: string;
+  upiId: string;
+  payeeName: string;
+  qrUrl: string;
+  note: string;
+  minDeposit: number;
+  maxDeposit: number;
+  depositsEnabled: boolean;
 }

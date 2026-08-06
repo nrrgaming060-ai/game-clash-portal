@@ -44,6 +44,16 @@ function AdminRequests() {
       <div className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
         {items.map((r) => (
           <div key={r.id} className="flex flex-wrap items-center gap-3 p-3 text-sm">
+            {r.proofUrl ? (
+              <a href={r.proofUrl} target="_blank" rel="noreferrer" className="shrink-0">
+                <img
+                  src={r.proofUrl}
+                  alt={`Payment proof from ${r.userName}`}
+                  className="h-12 w-12 rounded-lg border border-border object-cover"
+                  loading="lazy"
+                />
+              </a>
+            ) : null}
             <span className="min-w-0 flex-1">
               <span className="block truncate font-medium">
                 {r.userName} · <span className="capitalize">{r.kind}</span>
@@ -51,7 +61,11 @@ function AdminRequests() {
               <span className="block text-[11px] text-muted-foreground">
                 {r.method} · {r.accountRef} · {formatDateTime(r.createdAt)}
               </span>
+              {r.utr ? (
+                <span className="block text-[11px] font-medium text-primary">UTR: {r.utr}</span>
+              ) : null}
             </span>
+
             <span className="font-display font-bold text-gold">{inr(r.amount)}</span>
             {r.status === "pending" ? (
               <span className="flex gap-2">

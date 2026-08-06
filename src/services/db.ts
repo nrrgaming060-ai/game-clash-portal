@@ -5,6 +5,7 @@ import type {
   JoinedPlayer,
   LeaderboardEntry,
   MoneyRequest,
+  PaymentSettings,
   Room,
   Tournament,
   Transaction,
@@ -147,6 +148,8 @@ const toRequest = (r: Row): MoneyRequest => ({
   status: r.status,
   createdAt: r.created_at,
   handledAt: r.handled_at,
+  utr: r.utr ?? "",
+  proofUrl: r.proof_url ?? "",
 });
 
 const toNotification = (r: Row): AppNotification => ({
@@ -392,6 +395,8 @@ export async function createMoneyRequest(data: Omit<MoneyRequest, "id" | "status
     amount: data.amount,
     method: data.method,
     account_ref: data.accountRef,
+    utr: data.utr ?? "",
+    proof_url: data.proofUrl ?? "",
     status: "pending",
   } as never);
   err(error);
@@ -490,4 +495,65 @@ export async function updateAdvertisement(id: string, ad: AdvertisementInput) {
 export async function deleteAdvertisement(id: string) {
   const { error } = await supabase.from("advertisements").delete().eq("id", id);
   err(error);
+}
+
+/* ---------------------------- payment settings ---------------------------- */
+
+const toPaymentSettings = (r: Row): PaymentSettings => ({
+  id: r.id,
+  upiId: r.upi_id ?? "",
+  payeeName: r.payee_name ?? "",
+  qrUrl: r.qr_url ?? "",
+  note: r.note ?? "",
+  minDeposit: r.min_deposit ?? 10,
+  maxDeposit: r.max_deposit ?? 100000,
+  depositsEnabled: r.deposits_enabled ?? true,
+});
+
+export function watchPaymentSettings(cb: (s: PaymentSettings | null) => void): Unsub {
+  return live("payment_settings", async () => {
+    const { data, error } = await supabase
+      .from("payment_settings")
+      .select("*")
+      .limit(1)
+      .maybeSingle();
+    if (error || !data) return cb(null);
+    cb(toPaymentSettings(data));
+  });
+}
+
+export async function savePaymentSettings(s: Omit<PaymentSettings, "id"> & { id?: string }) {
+  const payload = {
+    upi_id: s.upiId,
+    payee_name: s.payeeName,
+    qr_url: s.qrUrl,
+    note: s.note,
+    min_deposit: s.minDeposit,
+    max_deposit: s.maxDeposit,
+    deposits_enabled: s.depositsEnabled,
+  };
+  if (s.id) {
+    const { error } = await supabase
+      .from("payment_settings")
+      .update(payload as never)
+      .eq("id", s.id);
+    err(error);
+    return;
+  }
+  const { error } = await supabase
+    .from("payment_settings")
+    .insert({ ...payload, singleton: true } as never);
+  err(error);
+}
+
+/** Builds a UPI deep link that opens GPay / PhonePe / Paytm with amount prefilled. */
+export function upiDeepLink(s: PaymentSettings, amount: number, note = "ClashArena deposit") {
+  const params = new URLSearchParams({
+    pa: s.upiId,
+    pn: s.payeeName || "ClashArena",
+    cu: "INR",
+    tn: note,
+  });
+  if (amount > 0) params.set("am", String(amount));
+  return `upi://pay?${params.toString()}`;
 }
