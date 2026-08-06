@@ -139,9 +139,11 @@ export type Database = {
           id: string
           kind: string
           method: string
+          proof_url: string
           status: string
           user_id: string
           user_name: string
+          utr: string
         }
         Insert: {
           account_ref?: string
@@ -151,9 +153,11 @@ export type Database = {
           id?: string
           kind: string
           method?: string
+          proof_url?: string
           status?: string
           user_id: string
           user_name?: string
+          utr?: string
         }
         Update: {
           account_ref?: string
@@ -163,9 +167,11 @@ export type Database = {
           id?: string
           kind?: string
           method?: string
+          proof_url?: string
           status?: string
           user_id?: string
           user_name?: string
+          utr?: string
         }
         Relationships: []
       }
@@ -190,6 +196,48 @@ export type Database = {
           message?: string
           target_audience?: string
           title?: string
+        }
+        Relationships: []
+      }
+      payment_settings: {
+        Row: {
+          created_at: string
+          deposits_enabled: boolean
+          id: string
+          max_deposit: number
+          min_deposit: number
+          note: string
+          payee_name: string
+          qr_url: string
+          singleton: boolean
+          updated_at: string
+          upi_id: string
+        }
+        Insert: {
+          created_at?: string
+          deposits_enabled?: boolean
+          id?: string
+          max_deposit?: number
+          min_deposit?: number
+          note?: string
+          payee_name?: string
+          qr_url?: string
+          singleton?: boolean
+          updated_at?: string
+          upi_id?: string
+        }
+        Update: {
+          created_at?: string
+          deposits_enabled?: boolean
+          id?: string
+          max_deposit?: number
+          min_deposit?: number
+          note?: string
+          payee_name?: string
+          qr_url?: string
+          singleton?: boolean
+          updated_at?: string
+          upi_id?: string
         }
         Relationships: []
       }
