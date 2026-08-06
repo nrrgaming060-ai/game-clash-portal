@@ -228,6 +228,53 @@ function WalletPage() {
         </TabsList>
 
         <TabsContent value="add" className="space-y-3 pt-4">
+          {pay && !pay.depositsEnabled && (
+            <p className="rounded-xl border border-warning/40 bg-warning/10 p-3 text-sm text-warning">
+              Deposits are paused right now. Please check back soon.
+            </p>
+          )}
+
+          <div className="rounded-2xl border border-border bg-card p-4 text-center">
+            {pay?.qrUrl ? (
+              <img
+                src={pay.qrUrl}
+                alt="Scan this UPI QR code to pay ClashArena"
+                className="mx-auto h-44 w-44 rounded-xl bg-white object-contain p-2"
+                loading="lazy"
+              />
+            ) : (
+              <div className="mx-auto grid h-44 w-44 place-items-center rounded-xl border border-dashed border-border text-xs text-muted-foreground">
+                QR coming soon
+              </div>
+            )}
+            <p className="mt-3 font-display text-lg font-bold">{pay?.upiId || "Not set yet"}</p>
+            {pay?.payeeName && (
+              <p className="text-xs text-muted-foreground">{pay.payeeName}</p>
+            )}
+            <div className="mt-3 flex gap-2">
+              <Button
+                variant="outline"
+                className="flex-1"
+                disabled={!pay?.upiId}
+                onClick={() => void copyUpi()}
+              >
+                <Copy className="mr-2 h-4 w-4" /> Copy UPI ID
+              </Button>
+              <Button
+                asChild={!!pay?.upiId}
+                className="flex-1 bg-gradient-gold text-background"
+                disabled={!pay?.upiId}
+              >
+                {pay?.upiId ? (
+                  <a href={upiDeepLink(pay, Number(add.amount) || 0)}>Pay via UPI app</a>
+                ) : (
+                  <span>Pay via UPI app</span>
+                )}
+              </Button>
+            </div>
+            {pay?.note && <p className="mt-3 text-xs text-muted-foreground">{pay.note}</p>}
+          </div>
+
           <div className="flex gap-2">
             {[50, 100, 250, 500].map((v) => (
               <button
@@ -240,7 +287,7 @@ function WalletPage() {
             ))}
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="a1">Amount (₹)</Label>
+            <Label htmlFor="a1">Amount paid (₹)</Label>
             <Input
               id="a1"
               inputMode="numeric"
@@ -249,27 +296,45 @@ function WalletPage() {
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="a2">UPI ID / payment reference</Label>
+            <Label htmlFor="a2">UTR / transaction reference</Label>
             <Input
               id="a2"
-              value={add.ref}
-              onChange={(e) => setAdd((s) => ({ ...s, ref: e.target.value }))}
-              placeholder="yourname@upi"
-              maxLength={80}
+              value={add.utr}
+              onChange={(e) => setAdd((s) => ({ ...s, utr: e.target.value }))}
+              placeholder="12-digit UTR from your UPI app"
+              maxLength={24}
             />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Payment screenshot (optional)</Label>
+            <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-dashed border-border bg-surface-2 p-3 text-sm text-muted-foreground">
+              {uploading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Upload className="h-4 w-4" />
+              )}
+              {uploading ? "Uploading…" : add.proofUrl ? "Screenshot attached" : "Attach screenshot"}
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => void onProof(e.target.files?.[0])}
+              />
+            </label>
           </div>
           <Button
             className="w-full bg-gradient-primary"
-            disabled={busy}
+            disabled={busy || uploading || !pay?.depositsEnabled}
             onClick={() => void submit("deposit")}
           >
-            {busy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Submit deposit request
+            {busy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} I have paid — submit
           </Button>
           <p className="text-xs text-muted-foreground">
-            Deposits are verified by an admin and credited to your deposit balance, usually within
-            minutes.
+            Pay first, then submit the UTR. Once verified, the amount is credited to your deposit
+            balance automatically — usually within minutes.
           </p>
         </TabsContent>
+
 
         <TabsContent value="out" className="space-y-3 pt-4">
           <div className="space-y-1.5">
