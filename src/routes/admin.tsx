@@ -16,6 +16,7 @@ const NAV = [
   { to: "/admin", label: "Overview", icon: BarChart3 },
   { to: "/admin/tournaments", label: "Tournaments", icon: Swords },
   { to: "/admin/results", label: "Results", icon: Trophy },
+  { to: "/admin/leaderboard", label: "Leaderboard", icon: Crown },
   { to: "/admin/requests", label: "Wallet", icon: Wallet },
   { to: "/admin/payments", label: "Payments", icon: QrCode },
   { to: "/admin/users", label: "Users", icon: Users },
