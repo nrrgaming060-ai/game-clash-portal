@@ -1,5 +1,5 @@
 import { Link, Outlet, createFileRoute, useRouterState } from "@tanstack/react-router";
-import { BarChart3, Bell, Image, QrCode, Swords, Trophy, Users, Wallet } from "lucide-react";
+import { BarChart3, Bell, Crown, Image, QrCode, Swords, Trophy, Users, Wallet } from "lucide-react";
 import { RequireAuth } from "@/components/RequireAuth";
 import { cn } from "@/lib/utils";
 
