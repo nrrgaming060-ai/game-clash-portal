@@ -53,6 +53,24 @@ export type Database = {
         }
         Relationships: []
       }
+      app_bootstrap: {
+        Row: {
+          admin_granted: boolean
+          created_at: string
+          id: boolean
+        }
+        Insert: {
+          admin_granted?: boolean
+          created_at?: string
+          id?: boolean
+        }
+        Update: {
+          admin_granted?: boolean
+          created_at?: string
+          id?: boolean
+        }
+        Relationships: []
+      }
       joined_players: {
         Row: {
           id: string

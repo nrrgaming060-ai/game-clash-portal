@@ -22,6 +22,7 @@ import { Route as ReferRouteImport } from './routes/refer'
 import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminAdvertisementsRouteImport } from './routes/admin.advertisements'
+import { Route as AdminLeaderboardRouteImport } from './routes/admin.leaderboard'
 import { Route as AdminNotificationsRouteImport } from './routes/admin.notifications'
 import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
 import { Route as AdminRequestsRouteImport } from './routes/admin.requests'
@@ -95,6 +96,11 @@ const AdminAdvertisementsRoute = AdminAdvertisementsRouteImport.update({
   path: '/advertisements',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminLeaderboardRoute = AdminLeaderboardRouteImport.update({
+  id: '/leaderboard',
+  path: '/leaderboard',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminNotificationsRoute = AdminNotificationsRouteImport.update({
   id: '/notifications',
   path: '/notifications',
@@ -144,6 +150,7 @@ export interface FileRoutesByFullPath {
   '/refer': typeof ReferRoute
   '/wallet': typeof WalletRoute
   '/admin/advertisements': typeof AdminAdvertisementsRoute
+  '/admin/leaderboard': typeof AdminLeaderboardRoute
   '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/requests': typeof AdminRequestsRoute
@@ -165,6 +172,7 @@ export interface FileRoutesByTo {
   '/refer': typeof ReferRoute
   '/wallet': typeof WalletRoute
   '/admin/advertisements': typeof AdminAdvertisementsRoute
+  '/admin/leaderboard': typeof AdminLeaderboardRoute
   '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/requests': typeof AdminRequestsRoute
@@ -188,6 +196,7 @@ export interface FileRoutesById {
   '/refer': typeof ReferRoute
   '/wallet': typeof WalletRoute
   '/admin/advertisements': typeof AdminAdvertisementsRoute
+  '/admin/leaderboard': typeof AdminLeaderboardRoute
   '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/requests': typeof AdminRequestsRoute
@@ -212,6 +221,7 @@ export interface FileRouteTypes {
     | '/refer'
     | '/wallet'
     | '/admin/advertisements'
+    | '/admin/leaderboard'
     | '/admin/notifications'
     | '/admin/payments'
     | '/admin/requests'
@@ -233,6 +243,7 @@ export interface FileRouteTypes {
     | '/refer'
     | '/wallet'
     | '/admin/advertisements'
+    | '/admin/leaderboard'
     | '/admin/notifications'
     | '/admin/payments'
     | '/admin/requests'
@@ -255,6 +266,7 @@ export interface FileRouteTypes {
     | '/refer'
     | '/wallet'
     | '/admin/advertisements'
+    | '/admin/leaderboard'
     | '/admin/notifications'
     | '/admin/payments'
     | '/admin/requests'
@@ -373,6 +385,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdvertisementsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/leaderboard': {
+      id: '/admin/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/admin/leaderboard'
+      preLoaderRoute: typeof AdminLeaderboardRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/notifications': {
       id: '/admin/notifications'
       path: '/notifications'
@@ -427,6 +446,7 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminAdvertisementsRoute: typeof AdminAdvertisementsRoute
+  AdminLeaderboardRoute: typeof AdminLeaderboardRoute
   AdminNotificationsRoute: typeof AdminNotificationsRoute
   AdminPaymentsRoute: typeof AdminPaymentsRoute
   AdminRequestsRoute: typeof AdminRequestsRoute
@@ -438,6 +458,7 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAdvertisementsRoute: AdminAdvertisementsRoute,
+  AdminLeaderboardRoute: AdminLeaderboardRoute,
   AdminNotificationsRoute: AdminNotificationsRoute,
   AdminPaymentsRoute: AdminPaymentsRoute,
   AdminRequestsRoute: AdminRequestsRoute,
@@ -466,13 +487,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

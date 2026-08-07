@@ -100,16 +100,24 @@ function Landing() {
 
           <div className="mx-auto mt-14 grid max-w-2xl grid-cols-3 gap-3">
             {[
-              ["50K+", "Matches hosted"],
-              ["₹1.2Cr", "Prizes paid"],
-              ["24/7", "Support"],
+              ["Solo · Duo · Squad", "Every bracket"],
+              ["15 min", "Room ID unlock"],
+              ["24/7", "Player support"],
             ].map(([v, l]) => (
-              <div key={l} className="rounded-2xl glass p-4">
-                <p className="font-display text-2xl font-bold text-gradient-gold">{v}</p>
-                <p className="text-xs text-muted-foreground">{l}</p>
+              <div
+                key={l}
+                className="rounded-2xl glass p-4 transition-all hover:border-gold/40 hover:glow-gold"
+              >
+                <p className="font-display text-lg font-bold leading-tight text-gradient-gold sm:text-2xl">
+                  {v}
+                </p>
+                <p className="mt-1 text-[11px] uppercase tracking-wide text-muted-foreground">
+                  {l}
+                </p>
               </div>
             ))}
           </div>
+
         </div>
       </section>
 
