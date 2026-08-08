@@ -391,6 +391,26 @@ function WalletPage() {
 
         <TabsContent value="out" className="space-y-3 pt-4">
           <div className="space-y-1.5">
+            <Label>Withdrawal method</Label>
+            <div className="grid grid-cols-3 gap-2">
+              {PAYOUT_METHODS.map((m) => (
+                <button
+                  key={m.value}
+                  type="button"
+                  onClick={() => setOut((s) => ({ ...s, method: m.value }))}
+                  className={`flex flex-col items-center gap-1.5 rounded-xl border p-3 text-[11px] font-medium transition-all ${
+                    out.method === m.value
+                      ? "border-gold/50 bg-gold/10 text-gold"
+                      : "border-border bg-surface-2 text-muted-foreground"
+                  }`}
+                >
+                  <m.icon className="h-4 w-4" />
+                  {m.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="space-y-1.5">
             <Label htmlFor="w1">Amount (₹)</Label>
             <Input
               id="w1"
@@ -399,16 +419,62 @@ function WalletPage() {
               onChange={(e) => setOut((s) => ({ ...s, amount: e.target.value }))}
             />
           </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="w2">Payout UPI ID</Label>
-            <Input
-              id="w2"
-              value={out.ref}
-              onChange={(e) => setOut((s) => ({ ...s, ref: e.target.value }))}
-              placeholder="yourname@upi"
-              maxLength={80}
-            />
-          </div>
+
+          {out.method === "upi" && (
+            <div className="space-y-1.5">
+              <Label htmlFor="w2">Payout UPI ID</Label>
+              <Input
+                id="w2"
+                value={out.upiId}
+                onChange={(e) => setOut((s) => ({ ...s, upiId: e.target.value }))}
+                placeholder="yourname@upi"
+                maxLength={80}
+              />
+            </div>
+          )}
+
+          {out.method === "bank" && (
+            <>
+              <div className="space-y-1.5">
+                <Label htmlFor="w3">Account holder name</Label>
+                <Input
+                  id="w3"
+                  value={out.holder}
+                  onChange={(e) => setOut((s) => ({ ...s, holder: e.target.value }))}
+                  placeholder="As printed on your passbook"
+                  maxLength={60}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="w4">Account number</Label>
+                <Input
+                  id="w4"
+                  inputMode="numeric"
+                  value={out.account}
+                  onChange={(e) => setOut((s) => ({ ...s, account: e.target.value }))}
+                  maxLength={18}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="w5">IFSC code</Label>
+                <Input
+                  id="w5"
+                  value={out.ifsc}
+                  onChange={(e) => setOut((s) => ({ ...s, ifsc: e.target.value }))}
+                  placeholder="SBIN0123456"
+                  maxLength={11}
+                />
+              </div>
+            </>
+          )}
+
+          {out.method === "redeem" && (
+            <p className="rounded-xl border border-border bg-surface-2 p-3 text-xs text-muted-foreground">
+              A Google Play redeem code worth your withdrawal amount will appear in your history
+              once the team marks your request as paid.
+            </p>
+          )}
+
           <Button
             className="w-full bg-gradient-gold text-background"
             disabled={busy}
@@ -428,13 +494,30 @@ function WalletPage() {
               {reqs.map((r) => (
                 <div
                   key={r.id}
-                  className="flex items-center gap-3 rounded-xl border border-border bg-card p-3 text-sm"
+                  className="rounded-xl border border-border bg-card p-3 text-sm"
                 >
-                  <span className="capitalize">{r.kind}</span>
-                  <span className="font-semibold">{inr(r.amount)}</span>
-                  <span className="ml-auto">
-                    <StatusPill status={r.status} />
-                  </span>
+                  <div className="flex items-center gap-3">
+                    <span className="capitalize">{r.kind}</span>
+                    <span className="text-[11px] text-muted-foreground">{r.method}</span>
+                    <span className="font-semibold">{inr(r.amount)}</span>
+                    <span className="ml-auto">
+                      <StatusPill status={r.status} />
+                    </span>
+                  </div>
+                  {r.status === "paid" && r.payoutMethod === "redeem" && r.redeemCode && (
+                    <button
+                      onClick={() => {
+                        void navigator.clipboard.writeText(r.redeemCode);
+                        toast.success("Redeem code copied");
+                      }}
+                      className="mt-2 flex w-full items-center justify-between rounded-lg border border-gold/40 bg-gold/10 px-3 py-2"
+                    >
+                      <span className="font-mono text-sm font-semibold text-gold">
+                        {r.redeemCode}
+                      </span>
+                      <Copy className="h-3.5 w-3.5 text-gold" />
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
