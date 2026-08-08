@@ -188,7 +188,7 @@ function TournamentDetail() {
       <Tabs defaultValue="rules" className="mt-4">
         <TabsList className="grid w-full grid-cols-2 bg-surface-2">
           <TabsTrigger value="rules">Rules</TabsTrigger>
-          <TabsTrigger value="players">Players ({players.length})</TabsTrigger>
+          <TabsTrigger value="players">My Player ID</TabsTrigger>
         </TabsList>
         <TabsContent value="rules" className="pt-3">
           <ul className="space-y-2 rounded-2xl border border-border bg-card p-4 text-sm">
@@ -201,19 +201,39 @@ function TournamentDetail() {
           </ul>
         </TabsContent>
         <TabsContent value="players" className="pt-3">
-          <div className="divide-y divide-border rounded-2xl border border-border bg-card">
-            {players.length === 0 && (
-              <p className="p-4 text-sm text-muted-foreground">No players registered yet.</p>
-            )}
-            {players.map((p, i) => (
-              <div key={p.id} className="flex items-center gap-3 p-3 text-sm">
-                <span className="w-6 text-center text-xs text-muted-foreground">{i + 1}</span>
-                <span className="font-medium">{p.userName}</span>
-                <span className="ml-auto font-mono text-xs text-muted-foreground">
-                  {p.playerGameUid}
-                </span>
-              </div>
-            ))}
+          <div className="rounded-2xl border border-border bg-card p-4">
+            {(() => {
+              const me = players.find((p) => p.userId === profile?.uid);
+              if (!me)
+                return (
+                  <p className="text-sm text-muted-foreground">
+                    {joined
+                      ? "Loading your player entry…"
+                      : "Join this match to see your player entry here."}
+                  </p>
+                );
+              return (
+                <div>
+                  <p className="mb-3 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                    My player entry
+                  </p>
+                  <div className="grid gap-2 sm:grid-cols-3">
+                    {(
+                      [
+                        ["Name", me.userName],
+                        ["In-Game Name", me.playerGameName || "—"],
+                        ["In-Game ID", me.playerGameUid || "—"],
+                      ] as const
+                    ).map(([l, v]) => (
+                      <div key={l} className="rounded-xl bg-surface-2 p-3">
+                        <p className="text-[10px] uppercase text-muted-foreground">{l}</p>
+                        <p className="truncate font-medium">{v}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </TabsContent>
       </Tabs>
