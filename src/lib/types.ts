@@ -16,6 +16,7 @@ export interface UserProfile {
   name: string;
   email: string;
   phone: string;
+  gameName: string;
   gameUid: string;
   avatarUrl: string;
   joinedAt: Ts;
@@ -54,6 +55,7 @@ export interface JoinedPlayer {
   tournamentId: string;
   userId: string;
   userName: string;
+  playerGameName: string;
   playerGameUid: string;
   joinedAt: Ts;
   kills?: number;
@@ -117,7 +119,8 @@ export interface Transaction {
   createdAt: Ts;
 }
 
-export type RequestStatus = "pending" | "approved" | "rejected";
+export type RequestStatus = "pending" | "approved" | "rejected" | "paid";
+export type PayoutMethod = "upi" | "redeem" | "bank";
 
 export interface MoneyRequest {
   id: string;
@@ -132,6 +135,18 @@ export interface MoneyRequest {
   handledAt?: Ts;
   utr?: string;
   proofUrl?: string;
+  payoutMethod: PayoutMethod;
+  accountHolder: string;
+  accountNumber: string;
+  ifsc: string;
+  redeemCode: string;
+}
+
+export interface CategoryItem {
+  id: string;
+  name: string;
+  active: boolean;
+  sortOrder: number;
 }
 
 export interface PaymentSettings {
