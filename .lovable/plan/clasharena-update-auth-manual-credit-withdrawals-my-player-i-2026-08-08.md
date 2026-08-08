@@ -63,3 +63,24 @@ End-to-end checks in the browser before claiming done: email signup + login, pas
 - Migration 1: `profiles.game_name` column; `joined_players.player_game_name` column; replace `joined_players` public read policy with own-row + admin policies; new `categories` table (GRANTs, RLS: public read/admin write, seeded Solo/Duo/Squad); rewrite `join_tournament` (copy IGN, first-join referral payout); rewrite `apply_referral` (link only, no credit).
 - Migration 2: `money_requests` gains `payout_method`, `account_holder`, `account_number`, `ifsc`, `redeem_code`, and a `paid` status (with CHECK constraints); rework `resolve_request` into approve/reject/mark-paid with row locks; new `admin_credit` security-definer routine; revoke PUBLIC/anon execute on new routines.
 - Frontend: `auth.tsx`, new `reset-password.tsx`, `AuthContext.tsx`, `wallet.tsx`, `tournaments.$id.tsx`, `onboarding.tsx`, `menu.tsx`, `admin.tsx` nav, new `admin.credit.tsx`, `admin.categories.tsx`, `admin.transactions.tsx`, split `admin.requests.tsx` into deposits/withdrawals, rename advertisements to Banners, `services/db.ts`, `lib/types.ts`.
+- Update the Leaderboard in my Clash Arena app.
+
+- Add an admin option to remove/hide any player from the leaderboard.
+
+- Admin can select a player and remove them from the leaderboard.
+
+- Removing a player from the leaderboard must NOT delete their account, wallet, tournaments, or transaction history.
+
+- Only remove their leaderboard entry.
+
+- After removal, automatically recalculate the leaderboard rankings.
+
+- Show a confirmation before removing.
+
+- Normal users cannot remove or edit leaderboard players.
+
+- Keep the existing leaderboard design unchanged.
+
+Also whenever players join the match the wallet should immediately cut the amount 
+
+&nbsp;
