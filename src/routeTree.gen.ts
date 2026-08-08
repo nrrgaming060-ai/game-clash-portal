@@ -19,6 +19,7 @@ import { Route as MyMatchesRouteImport } from './routes/my-matches'
 import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as ReferRouteImport } from './routes/refer'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminAdvertisementsRouteImport } from './routes/admin.advertisements'
@@ -79,6 +80,11 @@ const OnboardingRoute = OnboardingRouteImport.update({
 const ReferRoute = ReferRouteImport.update({
   id: '/refer',
   path: '/refer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const WalletRoute = WalletRouteImport.update({
@@ -148,6 +154,7 @@ export interface FileRoutesByFullPath {
   '/notifications': typeof NotificationsRoute
   '/onboarding': typeof OnboardingRoute
   '/refer': typeof ReferRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/wallet': typeof WalletRoute
   '/admin/advertisements': typeof AdminAdvertisementsRoute
   '/admin/leaderboard': typeof AdminLeaderboardRoute
@@ -170,6 +177,7 @@ export interface FileRoutesByTo {
   '/notifications': typeof NotificationsRoute
   '/onboarding': typeof OnboardingRoute
   '/refer': typeof ReferRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/wallet': typeof WalletRoute
   '/admin/advertisements': typeof AdminAdvertisementsRoute
   '/admin/leaderboard': typeof AdminLeaderboardRoute
@@ -194,6 +202,7 @@ export interface FileRoutesById {
   '/notifications': typeof NotificationsRoute
   '/onboarding': typeof OnboardingRoute
   '/refer': typeof ReferRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/wallet': typeof WalletRoute
   '/admin/advertisements': typeof AdminAdvertisementsRoute
   '/admin/leaderboard': typeof AdminLeaderboardRoute
@@ -219,6 +228,7 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/onboarding'
     | '/refer'
+    | '/reset-password'
     | '/wallet'
     | '/admin/advertisements'
     | '/admin/leaderboard'
@@ -241,6 +251,7 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/onboarding'
     | '/refer'
+    | '/reset-password'
     | '/wallet'
     | '/admin/advertisements'
     | '/admin/leaderboard'
@@ -264,6 +275,7 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/onboarding'
     | '/refer'
+    | '/reset-password'
     | '/wallet'
     | '/admin/advertisements'
     | '/admin/leaderboard'
@@ -288,6 +300,7 @@ export interface RootRouteChildren {
   NotificationsRoute: typeof NotificationsRoute
   OnboardingRoute: typeof OnboardingRoute
   ReferRoute: typeof ReferRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   WalletRoute: typeof WalletRoute
   TournamentsIdRoute: typeof TournamentsIdRoute
 }
@@ -362,6 +375,13 @@ declare module '@tanstack/react-router' {
       path: '/refer'
       fullPath: '/refer'
       preLoaderRoute: typeof ReferRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/wallet': {
@@ -481,6 +501,7 @@ const rootRouteChildren: RootRouteChildren = {
   NotificationsRoute: NotificationsRoute,
   OnboardingRoute: OnboardingRoute,
   ReferRoute: ReferRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   WalletRoute: WalletRoute,
   TournamentsIdRoute: TournamentsIdRoute,
 }

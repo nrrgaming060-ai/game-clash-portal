@@ -21,7 +21,7 @@ const NAV = [
   { to: "/admin/payments", label: "Payments", icon: QrCode },
   { to: "/admin/users", label: "Users", icon: Users },
   { to: "/admin/notifications", label: "Notices", icon: Bell },
-  { to: "/admin/advertisements", label: "Ads", icon: Image },
+  { to: "/admin/advertisements", label: "Banners", icon: Image },
 ] as const;
 
 function AdminLayout() {
