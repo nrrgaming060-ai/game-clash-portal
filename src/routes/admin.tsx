@@ -1,5 +1,5 @@
 import { Link, Outlet, createFileRoute, useRouterState } from "@tanstack/react-router";
-import { BarChart3, Bell, Crown, Image, QrCode, Swords, Trophy, Users, Wallet } from "lucide-react";
+import { ArrowLeftRight, ArrowUpFromLine, Banknote, BarChart3, Bell, Crown, HandCoins, Image, QrCode, Shapes, Swords, Trophy, Users } from "lucide-react";
 import { RequireAuth } from "@/components/RequireAuth";
 import { cn } from "@/lib/utils";
 
@@ -17,7 +17,11 @@ const NAV = [
   { to: "/admin/tournaments", label: "Tournaments", icon: Swords },
   { to: "/admin/results", label: "Results", icon: Trophy },
   { to: "/admin/leaderboard", label: "Leaderboard", icon: Crown },
-  { to: "/admin/requests", label: "Wallet", icon: Wallet },
+  { to: "/admin/deposits", label: "Deposits", icon: Banknote },
+  { to: "/admin/withdrawals", label: "Withdrawals", icon: ArrowUpFromLine },
+  { to: "/admin/transactions", label: "Transactions", icon: ArrowLeftRight },
+  { to: "/admin/credit", label: "Manual Credit", icon: HandCoins },
+  { to: "/admin/categories", label: "Categories", icon: Shapes },
   { to: "/admin/payments", label: "Payments", icon: QrCode },
   { to: "/admin/users", label: "Users", icon: Users },
   { to: "/admin/notifications", label: "Notices", icon: Bell },
