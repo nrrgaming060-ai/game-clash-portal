@@ -2,6 +2,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type {
   AppNotification,
   Advertisement,
+  CategoryItem,
   JoinedPlayer,
   LeaderboardEntry,
   MoneyRequest,
@@ -44,6 +45,7 @@ const toProfile = (r: Row): UserProfile => ({
   name: r.name,
   email: r.email,
   phone: r.phone,
+  gameName: r.game_name ?? "",
   gameUid: r.game_uid,
   avatarUrl: r.avatar_url,
   joinedAt: r.joined_at,
@@ -100,6 +102,7 @@ const toJoin = (r: Row): JoinedPlayer => ({
   tournamentId: r.tournament_id,
   userId: r.user_id,
   userName: r.user_name,
+  playerGameName: r.player_game_name ?? "",
   playerGameUid: r.player_game_uid,
   joinedAt: r.joined_at,
   kills: r.kills,
@@ -150,6 +153,11 @@ const toRequest = (r: Row): MoneyRequest => ({
   handledAt: r.handled_at,
   utr: r.utr ?? "",
   proofUrl: r.proof_url ?? "",
+  payoutMethod: r.payout_method ?? "upi",
+  accountHolder: r.account_holder ?? "",
+  accountNumber: r.account_number ?? "",
+  ifsc: r.ifsc ?? "",
+  redeemCode: r.redeem_code ?? "",
 });
 
 const toNotification = (r: Row): AppNotification => ({
@@ -214,6 +222,7 @@ export async function updateProfile(uid: string, patch: Partial<UserProfile>) {
   if (patch.name !== undefined) row.name = patch.name;
   if (patch.email !== undefined) row.email = patch.email;
   if (patch.phone !== undefined) row.phone = patch.phone;
+  if (patch.gameName !== undefined) row.game_name = patch.gameName;
   if (patch.gameUid !== undefined) row.game_uid = patch.gameUid;
   if (patch.avatarUrl !== undefined) row.avatar_url = patch.avatarUrl;
   if (patch.banned !== undefined) row.banned = patch.banned;
@@ -397,6 +406,10 @@ export async function createMoneyRequest(data: Omit<MoneyRequest, "id" | "status
     account_ref: data.accountRef,
     utr: data.utr ?? "",
     proof_url: data.proofUrl ?? "",
+    payout_method: data.payoutMethod ?? "upi",
+    account_holder: data.accountHolder ?? "",
+    account_number: data.accountNumber ?? "",
+    ifsc: data.ifsc ?? "",
     status: "pending",
   } as never);
   err(error);
@@ -428,6 +441,78 @@ export async function resolveRequest(req: MoneyRequest, approve: boolean) {
     p_request_id: req.id,
     p_approve: approve,
   });
+  err(error);
+}
+
+/** Marks an approved withdrawal as paid; redeem payouts need the manually issued code. */
+export async function markRequestPaid(requestId: string, redeemCode = "") {
+  const { error } = await supabase.rpc("mark_request_paid", {
+    p_request_id: requestId,
+    p_redeem_code: redeemCode,
+  });
+  err(error);
+}
+
+/** Admin-only manual wallet credit/debit, recorded as an "Admin Credit" transaction. */
+export async function adminCredit(userId: string, amount: number, reason: string) {
+  const { error } = await supabase.rpc("admin_credit", {
+    p_user_id: userId,
+    p_amount: amount,
+    p_reason: reason,
+  });
+  err(error);
+}
+
+export function watchAllTransactions(cb: (t: Transaction[]) => void): Unsub {
+  return live("transactions", async () => {
+    const { data } = await supabase
+      .from("transactions")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(300);
+    cb((data ?? []).map(toTx));
+  });
+}
+
+/** Removes a leaderboard row only — the account, wallet and history are untouched. */
+export async function removeLeaderboardEntry(id: string) {
+  const { error } = await supabase.from("leaderboards").delete().eq("id", id);
+  err(error);
+}
+
+/* -------------------------------- categories ------------------------------- */
+
+const toCategory = (r: Row): CategoryItem => ({
+  id: r.id,
+  name: r.name,
+  active: r.active,
+  sortOrder: r.sort_order,
+});
+
+export function watchCategories(cb: (c: CategoryItem[]) => void): Unsub {
+  return live("categories", async () => {
+    const { data } = await supabase
+      .from("categories")
+      .select("*")
+      .order("sort_order", { ascending: true });
+    cb((data ?? []).map(toCategory));
+  });
+}
+
+export async function createCategory(name: string, sortOrder: number) {
+  const { error } = await supabase
+    .from("categories")
+    .insert({ name, sort_order: sortOrder } as never);
+  err(error);
+}
+
+export async function updateCategory(id: string, patch: { name?: string; active?: boolean }) {
+  const { error } = await supabase.from("categories").update(patch as never).eq("id", id);
+  err(error);
+}
+
+export async function deleteCategory(id: string) {
+  const { error } = await supabase.from("categories").delete().eq("id", id);
   err(error);
 }
 
