@@ -71,11 +71,36 @@ export type Database = {
         }
         Relationships: []
       }
+      categories: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          name: string
+          sort_order: number
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name: string
+          sort_order?: number
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
       joined_players: {
         Row: {
           id: string
           joined_at: string
           kills: number
+          player_game_name: string
           player_game_uid: string
           points: number
           rank: number
@@ -87,6 +112,7 @@ export type Database = {
           id?: string
           joined_at?: string
           kills?: number
+          player_game_name?: string
           player_game_uid?: string
           points?: number
           rank?: number
@@ -98,6 +124,7 @@ export type Database = {
           id?: string
           joined_at?: string
           kills?: number
+          player_game_name?: string
           player_game_uid?: string
           points?: number
           rank?: number
@@ -265,6 +292,7 @@ export type Database = {
           banned: boolean
           deposit_balance: number
           email: string
+          game_name: string
           game_uid: string
           id: string
           joined_at: string
@@ -282,6 +310,7 @@ export type Database = {
           banned?: boolean
           deposit_balance?: number
           email?: string
+          game_name?: string
           game_uid?: string
           id: string
           joined_at?: string
@@ -299,6 +328,7 @@ export type Database = {
           banned?: boolean
           deposit_balance?: number
           email?: string
+          game_name?: string
           game_uid?: string
           id?: string
           joined_at?: string
@@ -468,6 +498,7 @@ export type Database = {
           banned: boolean
           deposit_balance: number
           email: string
+          game_name: string
           game_uid: string
           id: string
           joined_at: string
