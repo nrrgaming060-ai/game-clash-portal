@@ -16,7 +16,7 @@ export const Route = createFileRoute("/auth")({
       { title: "Sign in — ClashArena" },
       {
         name: "description",
-        content: "Sign in to ClashArena with Google or email to join esports tournaments.",
+        content: "Sign in to ClashArena with your email to join esports tournaments.",
       },
       { property: "og:title", content: "Sign in — ClashArena" },
       { property: "og:description", content: "Access your ClashArena player account." },
@@ -43,7 +43,7 @@ function authMessage(e: unknown) {
 }
 
 function AuthPage() {
-  const { user, signInGoogle, signInEmail, signUpEmail, resetPassword } = useAuth();
+  const { user, signInEmail, signUpEmail, resetPassword } = useAuth();
 
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
@@ -93,25 +93,6 @@ function AuthPage() {
         </div>
 
         <div className="rounded-2xl glass p-6">
-          <Button
-            variant="outline"
-            className="w-full gap-2 border-border bg-surface-2"
-            disabled={busy}
-            onClick={() => void run(signInGoogle)}
-          >
-            <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden>
-              <path
-                fill="currentColor"
-                d="M21.35 11.1H12v2.9h5.35c-.25 1.4-1.75 4.1-5.35 4.1a6 6 0 1 1 0-12 5.3 5.3 0 0 1 3.75 1.45l2-1.95A8.6 8.6 0 0 0 12 3a9 9 0 1 0 0 18c5.2 0 8.65-3.65 8.65-8.8 0-.6-.1-1.4-.3-2.1Z"
-              />
-            </svg>
-            Continue with Google
-          </Button>
-
-          <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
-            <span className="h-px flex-1 bg-border" /> or <span className="h-px flex-1 bg-border" />
-          </div>
-
           <Tabs defaultValue="in">
             <TabsList className="grid w-full grid-cols-2 bg-surface-2">
               <TabsTrigger value="in">Sign in</TabsTrigger>

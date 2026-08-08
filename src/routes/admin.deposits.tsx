@@ -7,30 +7,33 @@ import { inr, formatDateTime } from "@/lib/time";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-export const Route = createFileRoute("/admin/requests")({
+export const Route = createFileRoute("/admin/deposits")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Wallet requests — ClashArena Admin" },
-      { name: "description", content: "Approve deposits and withdrawals for ClashArena players." },
-      { property: "og:title", content: "Wallet requests — ClashArena Admin" },
-      { property: "og:description", content: "Deposit and withdrawal approval queue." },
+      { title: "Deposits — ClashArena Admin" },
+      { name: "description", content: "Verify UPI deposits and credit player wallets." },
+      { property: "og:title", content: "Deposits — ClashArena Admin" },
+      { property: "og:description", content: "Deposit verification queue." },
     ],
   }),
-  component: AdminRequests,
+  component: AdminDeposits,
 });
 
-function AdminRequests() {
+function AdminDeposits() {
   const [items, setItems] = useState<MoneyRequest[]>([]);
   const [busy, setBusy] = useState<string | null>(null);
 
-  useEffect(() => watchAllRequests(setItems), []);
+  useEffect(
+    () => watchAllRequests((rows) => setItems(rows.filter((r) => r.kind === "deposit"))),
+    [],
+  );
 
   const act = async (r: MoneyRequest, approve: boolean) => {
     setBusy(r.id);
     try {
       await resolveRequest(r, approve);
-      toast.success(approve ? "Request approved" : "Request rejected");
+      toast.success(approve ? "Deposit approved and wallet credited" : "Deposit rejected");
     } catch (e) {
       toast.error((e as Error).message);
     } finally {
@@ -40,7 +43,7 @@ function AdminRequests() {
 
   return (
     <div>
-      <h1 className="mb-4 font-display text-xl font-bold">Wallet requests</h1>
+      <h1 className="mb-4 font-display text-xl font-bold">Deposits</h1>
       <div className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
         {items.map((r) => (
           <div key={r.id} className="flex flex-wrap items-center gap-3 p-3 text-sm">
@@ -55,11 +58,9 @@ function AdminRequests() {
               </a>
             ) : null}
             <span className="min-w-0 flex-1">
-              <span className="block truncate font-medium">
-                {r.userName} · <span className="capitalize">{r.kind}</span>
-              </span>
+              <span className="block truncate font-medium">{r.userName}</span>
               <span className="block text-[11px] text-muted-foreground">
-                {r.method} · {r.accountRef} · {formatDateTime(r.createdAt)}
+                {r.method} · {formatDateTime(r.createdAt)}
               </span>
               {r.utr ? (
                 <span className="block text-[11px] font-medium text-primary">UTR: {r.utr}</span>
@@ -92,7 +93,7 @@ function AdminRequests() {
             )}
           </div>
         ))}
-        {items.length === 0 && <p className="p-4 text-sm text-muted-foreground">No requests.</p>}
+        {items.length === 0 && <p className="p-4 text-sm text-muted-foreground">No deposits.</p>}
       </div>
     </div>
   );

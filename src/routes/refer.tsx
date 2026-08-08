@@ -52,7 +52,7 @@ function Refer() {
         </span>
         <h1 className="mt-4 font-display text-2xl font-bold">Invite friends, earn ₹5 each</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          You and your friend both get ₹5 in deposit balance when they sign up with your code.
+          You and your friend both get ₹5 the moment they join their first match with your code.
         </p>
 
         <div className="mt-6 flex items-center gap-2 rounded-xl border border-dashed border-gold/50 bg-surface-2 p-3">
@@ -81,7 +81,7 @@ function Refer() {
         {[
           ["Share your code", "Send it to teammates on WhatsApp, Discord or Instagram."],
           ["They sign up", "Your friend enters the code while completing their profile."],
-          ["Both get paid", "₹5 lands in each deposit wallet, instantly usable for entry fees."],
+          ["Both get paid", "₹5 lands in each deposit wallet as soon as your friend joins a match."],
         ].map(([t, b], i) => (
           <div key={t} className="flex gap-3 rounded-2xl border border-border bg-card p-4">
             <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary/15 font-display text-sm font-bold text-primary">

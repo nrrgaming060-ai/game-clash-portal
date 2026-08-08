@@ -71,11 +71,36 @@ export type Database = {
         }
         Relationships: []
       }
+      categories: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          name: string
+          sort_order: number
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name: string
+          sort_order?: number
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
       joined_players: {
         Row: {
           id: string
           joined_at: string
           kills: number
+          player_game_name: string
           player_game_uid: string
           points: number
           rank: number
@@ -87,6 +112,7 @@ export type Database = {
           id?: string
           joined_at?: string
           kills?: number
+          player_game_name?: string
           player_game_uid?: string
           points?: number
           rank?: number
@@ -98,6 +124,7 @@ export type Database = {
           id?: string
           joined_at?: string
           kills?: number
+          player_game_name?: string
           player_game_uid?: string
           points?: number
           rank?: number
@@ -150,42 +177,57 @@ export type Database = {
       }
       money_requests: {
         Row: {
+          account_holder: string
+          account_number: string
           account_ref: string
           amount: number
           created_at: string
           handled_at: string | null
           id: string
+          ifsc: string
           kind: string
           method: string
+          payout_method: string
           proof_url: string
+          redeem_code: string
           status: string
           user_id: string
           user_name: string
           utr: string
         }
         Insert: {
+          account_holder?: string
+          account_number?: string
           account_ref?: string
           amount?: number
           created_at?: string
           handled_at?: string | null
           id?: string
+          ifsc?: string
           kind: string
           method?: string
+          payout_method?: string
           proof_url?: string
+          redeem_code?: string
           status?: string
           user_id: string
           user_name?: string
           utr?: string
         }
         Update: {
+          account_holder?: string
+          account_number?: string
           account_ref?: string
           amount?: number
           created_at?: string
           handled_at?: string | null
           id?: string
+          ifsc?: string
           kind?: string
           method?: string
+          payout_method?: string
           proof_url?: string
+          redeem_code?: string
           status?: string
           user_id?: string
           user_name?: string
@@ -265,6 +307,7 @@ export type Database = {
           banned: boolean
           deposit_balance: number
           email: string
+          game_name: string
           game_uid: string
           id: string
           joined_at: string
@@ -282,6 +325,7 @@ export type Database = {
           banned?: boolean
           deposit_balance?: number
           email?: string
+          game_name?: string
           game_uid?: string
           id: string
           joined_at?: string
@@ -299,6 +343,7 @@ export type Database = {
           banned?: boolean
           deposit_balance?: number
           email?: string
+          game_name?: string
           game_uid?: string
           id?: string
           joined_at?: string
@@ -461,6 +506,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_credit: {
+        Args: { p_amount: number; p_reason: string; p_user_id: string }
+        Returns: undefined
+      }
       admin_list_users: {
         Args: never
         Returns: {
@@ -468,6 +517,7 @@ export type Database = {
           banned: boolean
           deposit_balance: number
           email: string
+          game_name: string
           game_uid: string
           id: string
           joined_at: string
@@ -506,6 +556,10 @@ export type Database = {
         Returns: boolean
       }
       join_tournament: { Args: { p_tournament_id: string }; Returns: undefined }
+      mark_request_paid: {
+        Args: { p_redeem_code?: string; p_request_id: string }
+        Returns: undefined
+      }
       resolve_request: {
         Args: { p_approve: boolean; p_request_id: string }
         Returns: undefined

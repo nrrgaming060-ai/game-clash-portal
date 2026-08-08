@@ -5,7 +5,10 @@ import {
   ArrowDownLeft,
   ArrowUpRight,
   Copy,
+  Gift,
+  Landmark,
   Loader2,
+  Smartphone,
   Upload,
   Wallet as WalletIcon,
 } from "lucide-react";
@@ -22,7 +25,7 @@ import {
   watchTransactions,
 } from "@/services/db";
 import { uploadFile } from "@/services/storage";
-import type { MoneyRequest, PaymentSettings, Transaction } from "@/lib/types";
+import type { MoneyRequest, PaymentSettings, PayoutMethod, Transaction } from "@/lib/types";
 import { inr, formatDateTime } from "@/lib/time";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -50,15 +53,31 @@ export const Route = createFileRoute("/wallet")({
   ),
 });
 
-const refSchema = z.string().trim().min(4, "Enter a valid UPI ID or reference").max(80);
+const upiSchema = z
+  .string()
+  .trim()
+  .regex(/^[\w.\-]{2,}@[A-Za-z]{2,}$/, "Enter a valid UPI ID (e.g. name@upi)")
+  .max(80);
+const holderSchema = z.string().trim().min(2, "Enter the account holder name").max(60);
+const accountSchema = z.string().trim().regex(/^\d{6,18}$/, "Enter a valid account number");
+const ifscSchema = z
+  .string()
+  .trim()
+  .regex(/^[A-Za-z]{4}0[A-Za-z0-9]{6}$/, "Enter a valid IFSC code (e.g. SBIN0123456)");
 const utrSchema = z
   .string()
   .trim()
   .regex(/^[A-Za-z0-9]{8,24}$/, "Enter the UTR / reference number from your payment app");
 
+const PAYOUT_METHODS: { value: PayoutMethod; label: string; icon: typeof Landmark }[] = [
+  { value: "upi", label: "UPI ID", icon: Smartphone },
+  { value: "redeem", label: "Google Redeem Code", icon: Gift },
+  { value: "bank", label: "Bank Account", icon: Landmark },
+];
+
 function StatusPill({ status }: { status: MoneyRequest["status"] }) {
   const cls =
-    status === "approved"
+    status === "approved" || status === "paid"
       ? "bg-success/15 text-success"
       : status === "rejected"
         ? "bg-destructive/15 text-destructive"
@@ -74,7 +93,14 @@ function WalletPage() {
   const [busy, setBusy] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [add, setAdd] = useState({ amount: "", utr: "", proofUrl: "" });
-  const [out, setOut] = useState({ amount: "", ref: "" });
+  const [out, setOut] = useState({
+    amount: "",
+    method: "upi" as PayoutMethod,
+    upiId: "",
+    holder: "",
+    account: "",
+    ifsc: "",
+  });
 
   useEffect(() => watchPaymentSettings(setPay), []);
 
@@ -119,7 +145,7 @@ function WalletPage() {
     }
     setUploading(true);
     try {
-      const url = await uploadFile("deposit-proofs", file);
+      const url = await uploadFile(`deposit-proofs/${profile?.uid}`, file);
       setAdd((s) => ({ ...s, proofUrl: url }));
       toast.success("Screenshot attached");
     } catch (e) {
@@ -140,6 +166,10 @@ function WalletPage() {
 
     let accountRef = "";
     let utr = "";
+    let methodLabel = "UPI";
+    let accountHolder = "";
+    let accountNumber = "";
+    let ifsc = "";
     if (kind === "deposit") {
       if (!pay?.depositsEnabled) {
         toast.error("Deposits are paused right now. Try again shortly.");
@@ -153,15 +183,33 @@ function WalletPage() {
       utr = u.data;
       accountRef = pay.upiId;
     } else {
-      const ref = refSchema.safeParse(out.ref);
-      if (!ref.success) {
-        toast.error(ref.error.issues[0]!.message);
-        return;
-      }
-      accountRef = ref.data;
       if (amt.data > win) {
         toast.error("You can only withdraw from your winnings balance");
         return;
+      }
+      if (out.method === "upi") {
+        const u = upiSchema.safeParse(out.upiId);
+        if (!u.success) {
+          toast.error(u.error.issues[0]!.message);
+          return;
+        }
+        accountRef = u.data;
+        methodLabel = "UPI";
+      } else if (out.method === "bank") {
+        for (const s of [holderSchema.safeParse(out.holder), accountSchema.safeParse(out.account), ifscSchema.safeParse(out.ifsc)]) {
+          if (!s.success) {
+            toast.error(s.error.issues[0]!.message);
+            return;
+          }
+        }
+        accountHolder = out.holder.trim();
+        accountNumber = out.account.trim();
+        ifsc = out.ifsc.trim().toUpperCase();
+        accountRef = `${accountNumber} · ${ifsc}`;
+        methodLabel = "Bank Account";
+      } else {
+        accountRef = "Google Redeem Code";
+        methodLabel = "Google Redeem Code";
       }
     }
 
@@ -172,10 +220,15 @@ function WalletPage() {
         userName: profile.name,
         kind,
         amount: amt.data,
-        method: "UPI",
+        method: methodLabel,
         accountRef,
         utr,
         proofUrl: kind === "deposit" ? add.proofUrl : "",
+        payoutMethod: kind === "withdrawal" ? out.method : "upi",
+        accountHolder,
+        accountNumber,
+        ifsc,
+        redeemCode: "",
       });
       toast.success(
         kind === "deposit"
@@ -183,7 +236,7 @@ function WalletPage() {
           : "Withdrawal request submitted",
       );
       if (kind === "deposit") setAdd({ amount: "", utr: "", proofUrl: "" });
-      else setOut({ amount: "", ref: "" });
+      else setOut({ amount: "", method: out.method, upiId: "", holder: "", account: "", ifsc: "" });
     } catch (e) {
       const msg = (e as Error).message;
       toast.error(
@@ -338,6 +391,26 @@ function WalletPage() {
 
         <TabsContent value="out" className="space-y-3 pt-4">
           <div className="space-y-1.5">
+            <Label>Withdrawal method</Label>
+            <div className="grid grid-cols-3 gap-2">
+              {PAYOUT_METHODS.map((m) => (
+                <button
+                  key={m.value}
+                  type="button"
+                  onClick={() => setOut((s) => ({ ...s, method: m.value }))}
+                  className={`flex flex-col items-center gap-1.5 rounded-xl border p-3 text-[11px] font-medium transition-all ${
+                    out.method === m.value
+                      ? "border-gold/50 bg-gold/10 text-gold"
+                      : "border-border bg-surface-2 text-muted-foreground"
+                  }`}
+                >
+                  <m.icon className="h-4 w-4" />
+                  {m.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="space-y-1.5">
             <Label htmlFor="w1">Amount (₹)</Label>
             <Input
               id="w1"
@@ -346,16 +419,62 @@ function WalletPage() {
               onChange={(e) => setOut((s) => ({ ...s, amount: e.target.value }))}
             />
           </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="w2">Payout UPI ID</Label>
-            <Input
-              id="w2"
-              value={out.ref}
-              onChange={(e) => setOut((s) => ({ ...s, ref: e.target.value }))}
-              placeholder="yourname@upi"
-              maxLength={80}
-            />
-          </div>
+
+          {out.method === "upi" && (
+            <div className="space-y-1.5">
+              <Label htmlFor="w2">Payout UPI ID</Label>
+              <Input
+                id="w2"
+                value={out.upiId}
+                onChange={(e) => setOut((s) => ({ ...s, upiId: e.target.value }))}
+                placeholder="yourname@upi"
+                maxLength={80}
+              />
+            </div>
+          )}
+
+          {out.method === "bank" && (
+            <>
+              <div className="space-y-1.5">
+                <Label htmlFor="w3">Account holder name</Label>
+                <Input
+                  id="w3"
+                  value={out.holder}
+                  onChange={(e) => setOut((s) => ({ ...s, holder: e.target.value }))}
+                  placeholder="As printed on your passbook"
+                  maxLength={60}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="w4">Account number</Label>
+                <Input
+                  id="w4"
+                  inputMode="numeric"
+                  value={out.account}
+                  onChange={(e) => setOut((s) => ({ ...s, account: e.target.value }))}
+                  maxLength={18}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="w5">IFSC code</Label>
+                <Input
+                  id="w5"
+                  value={out.ifsc}
+                  onChange={(e) => setOut((s) => ({ ...s, ifsc: e.target.value }))}
+                  placeholder="SBIN0123456"
+                  maxLength={11}
+                />
+              </div>
+            </>
+          )}
+
+          {out.method === "redeem" && (
+            <p className="rounded-xl border border-border bg-surface-2 p-3 text-xs text-muted-foreground">
+              A Google Play redeem code worth your withdrawal amount will appear in your history
+              once the team marks your request as paid.
+            </p>
+          )}
+
           <Button
             className="w-full bg-gradient-gold text-background"
             disabled={busy}
@@ -375,13 +494,30 @@ function WalletPage() {
               {reqs.map((r) => (
                 <div
                   key={r.id}
-                  className="flex items-center gap-3 rounded-xl border border-border bg-card p-3 text-sm"
+                  className="rounded-xl border border-border bg-card p-3 text-sm"
                 >
-                  <span className="capitalize">{r.kind}</span>
-                  <span className="font-semibold">{inr(r.amount)}</span>
-                  <span className="ml-auto">
-                    <StatusPill status={r.status} />
-                  </span>
+                  <div className="flex items-center gap-3">
+                    <span className="capitalize">{r.kind}</span>
+                    <span className="text-[11px] text-muted-foreground">{r.method}</span>
+                    <span className="font-semibold">{inr(r.amount)}</span>
+                    <span className="ml-auto">
+                      <StatusPill status={r.status} />
+                    </span>
+                  </div>
+                  {r.status === "paid" && r.payoutMethod === "redeem" && r.redeemCode && (
+                    <button
+                      onClick={() => {
+                        void navigator.clipboard.writeText(r.redeemCode);
+                        toast.success("Redeem code copied");
+                      }}
+                      className="mt-2 flex w-full items-center justify-between rounded-lg border border-gold/40 bg-gold/10 px-3 py-2"
+                    >
+                      <span className="font-mono text-sm font-semibold text-gold">
+                        {r.redeemCode}
+                      </span>
+                      <Copy className="h-3.5 w-3.5 text-gold" />
+                    </button>
+                  )}
                 </div>
               ))}
             </div>

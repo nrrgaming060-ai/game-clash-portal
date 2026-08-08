@@ -19,16 +19,21 @@ import { Route as MyMatchesRouteImport } from './routes/my-matches'
 import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as ReferRouteImport } from './routes/refer'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminAdvertisementsRouteImport } from './routes/admin.advertisements'
+import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
+import { Route as AdminCreditRouteImport } from './routes/admin.credit'
+import { Route as AdminDepositsRouteImport } from './routes/admin.deposits'
 import { Route as AdminLeaderboardRouteImport } from './routes/admin.leaderboard'
 import { Route as AdminNotificationsRouteImport } from './routes/admin.notifications'
 import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
-import { Route as AdminRequestsRouteImport } from './routes/admin.requests'
 import { Route as AdminResultsRouteImport } from './routes/admin.results'
 import { Route as AdminTournamentsRouteImport } from './routes/admin.tournaments'
+import { Route as AdminTransactionsRouteImport } from './routes/admin.transactions'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminWithdrawalsRouteImport } from './routes/admin.withdrawals'
 import { Route as TournamentsIdRouteImport } from './routes/tournaments.$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -81,6 +86,11 @@ const ReferRoute = ReferRouteImport.update({
   path: '/refer',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WalletRoute = WalletRouteImport.update({
   id: '/wallet',
   path: '/wallet',
@@ -94,6 +104,21 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
 const AdminAdvertisementsRoute = AdminAdvertisementsRouteImport.update({
   id: '/advertisements',
   path: '/advertisements',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCreditRoute = AdminCreditRouteImport.update({
+  id: '/credit',
+  path: '/credit',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminDepositsRoute = AdminDepositsRouteImport.update({
+  id: '/deposits',
+  path: '/deposits',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminLeaderboardRoute = AdminLeaderboardRouteImport.update({
@@ -111,11 +136,6 @@ const AdminPaymentsRoute = AdminPaymentsRouteImport.update({
   path: '/payments',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminRequestsRoute = AdminRequestsRouteImport.update({
-  id: '/requests',
-  path: '/requests',
-  getParentRoute: () => AdminRoute,
-} as any)
 const AdminResultsRoute = AdminResultsRouteImport.update({
   id: '/results',
   path: '/results',
@@ -126,9 +146,19 @@ const AdminTournamentsRoute = AdminTournamentsRouteImport.update({
   path: '/tournaments',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminTransactionsRoute = AdminTransactionsRouteImport.update({
+  id: '/transactions',
+  path: '/transactions',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminWithdrawalsRoute = AdminWithdrawalsRouteImport.update({
+  id: '/withdrawals',
+  path: '/withdrawals',
   getParentRoute: () => AdminRoute,
 } as any)
 const TournamentsIdRoute = TournamentsIdRouteImport.update({
@@ -148,15 +178,20 @@ export interface FileRoutesByFullPath {
   '/notifications': typeof NotificationsRoute
   '/onboarding': typeof OnboardingRoute
   '/refer': typeof ReferRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/wallet': typeof WalletRoute
   '/admin/advertisements': typeof AdminAdvertisementsRoute
+  '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/credit': typeof AdminCreditRoute
+  '/admin/deposits': typeof AdminDepositsRoute
   '/admin/leaderboard': typeof AdminLeaderboardRoute
   '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/payments': typeof AdminPaymentsRoute
-  '/admin/requests': typeof AdminRequestsRoute
   '/admin/results': typeof AdminResultsRoute
   '/admin/tournaments': typeof AdminTournamentsRoute
+  '/admin/transactions': typeof AdminTransactionsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/withdrawals': typeof AdminWithdrawalsRoute
   '/tournaments/$id': typeof TournamentsIdRoute
   '/admin/': typeof AdminIndexRoute
 }
@@ -170,15 +205,20 @@ export interface FileRoutesByTo {
   '/notifications': typeof NotificationsRoute
   '/onboarding': typeof OnboardingRoute
   '/refer': typeof ReferRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/wallet': typeof WalletRoute
   '/admin/advertisements': typeof AdminAdvertisementsRoute
+  '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/credit': typeof AdminCreditRoute
+  '/admin/deposits': typeof AdminDepositsRoute
   '/admin/leaderboard': typeof AdminLeaderboardRoute
   '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/payments': typeof AdminPaymentsRoute
-  '/admin/requests': typeof AdminRequestsRoute
   '/admin/results': typeof AdminResultsRoute
   '/admin/tournaments': typeof AdminTournamentsRoute
+  '/admin/transactions': typeof AdminTransactionsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/withdrawals': typeof AdminWithdrawalsRoute
   '/tournaments/$id': typeof TournamentsIdRoute
   '/admin': typeof AdminIndexRoute
 }
@@ -194,15 +234,20 @@ export interface FileRoutesById {
   '/notifications': typeof NotificationsRoute
   '/onboarding': typeof OnboardingRoute
   '/refer': typeof ReferRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/wallet': typeof WalletRoute
   '/admin/advertisements': typeof AdminAdvertisementsRoute
+  '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/credit': typeof AdminCreditRoute
+  '/admin/deposits': typeof AdminDepositsRoute
   '/admin/leaderboard': typeof AdminLeaderboardRoute
   '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/payments': typeof AdminPaymentsRoute
-  '/admin/requests': typeof AdminRequestsRoute
   '/admin/results': typeof AdminResultsRoute
   '/admin/tournaments': typeof AdminTournamentsRoute
+  '/admin/transactions': typeof AdminTransactionsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/withdrawals': typeof AdminWithdrawalsRoute
   '/tournaments/$id': typeof TournamentsIdRoute
   '/admin/': typeof AdminIndexRoute
 }
@@ -219,15 +264,20 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/onboarding'
     | '/refer'
+    | '/reset-password'
     | '/wallet'
     | '/admin/advertisements'
+    | '/admin/categories'
+    | '/admin/credit'
+    | '/admin/deposits'
     | '/admin/leaderboard'
     | '/admin/notifications'
     | '/admin/payments'
-    | '/admin/requests'
     | '/admin/results'
     | '/admin/tournaments'
+    | '/admin/transactions'
     | '/admin/users'
+    | '/admin/withdrawals'
     | '/tournaments/$id'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
@@ -241,15 +291,20 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/onboarding'
     | '/refer'
+    | '/reset-password'
     | '/wallet'
     | '/admin/advertisements'
+    | '/admin/categories'
+    | '/admin/credit'
+    | '/admin/deposits'
     | '/admin/leaderboard'
     | '/admin/notifications'
     | '/admin/payments'
-    | '/admin/requests'
     | '/admin/results'
     | '/admin/tournaments'
+    | '/admin/transactions'
     | '/admin/users'
+    | '/admin/withdrawals'
     | '/tournaments/$id'
     | '/admin'
   id:
@@ -264,15 +319,20 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/onboarding'
     | '/refer'
+    | '/reset-password'
     | '/wallet'
     | '/admin/advertisements'
+    | '/admin/categories'
+    | '/admin/credit'
+    | '/admin/deposits'
     | '/admin/leaderboard'
     | '/admin/notifications'
     | '/admin/payments'
-    | '/admin/requests'
     | '/admin/results'
     | '/admin/tournaments'
+    | '/admin/transactions'
     | '/admin/users'
+    | '/admin/withdrawals'
     | '/tournaments/$id'
     | '/admin/'
   fileRoutesById: FileRoutesById
@@ -288,6 +348,7 @@ export interface RootRouteChildren {
   NotificationsRoute: typeof NotificationsRoute
   OnboardingRoute: typeof OnboardingRoute
   ReferRoute: typeof ReferRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   WalletRoute: typeof WalletRoute
   TournamentsIdRoute: typeof TournamentsIdRoute
 }
@@ -364,6 +425,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReferRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/wallet': {
       id: '/wallet'
       path: '/wallet'
@@ -383,6 +451,27 @@ declare module '@tanstack/react-router' {
       path: '/advertisements'
       fullPath: '/admin/advertisements'
       preLoaderRoute: typeof AdminAdvertisementsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/categories': {
+      id: '/admin/categories'
+      path: '/categories'
+      fullPath: '/admin/categories'
+      preLoaderRoute: typeof AdminCategoriesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/credit': {
+      id: '/admin/credit'
+      path: '/credit'
+      fullPath: '/admin/credit'
+      preLoaderRoute: typeof AdminCreditRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/deposits': {
+      id: '/admin/deposits'
+      path: '/deposits'
+      fullPath: '/admin/deposits'
+      preLoaderRoute: typeof AdminDepositsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/leaderboard': {
@@ -406,13 +495,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPaymentsRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/requests': {
-      id: '/admin/requests'
-      path: '/requests'
-      fullPath: '/admin/requests'
-      preLoaderRoute: typeof AdminRequestsRouteImport
-      parentRoute: typeof AdminRoute
-    }
     '/admin/results': {
       id: '/admin/results'
       path: '/results'
@@ -427,11 +509,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminTournamentsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/transactions': {
+      id: '/admin/transactions'
+      path: '/transactions'
+      fullPath: '/admin/transactions'
+      preLoaderRoute: typeof AdminTransactionsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/users': {
       id: '/admin/users'
       path: '/users'
       fullPath: '/admin/users'
       preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/withdrawals': {
+      id: '/admin/withdrawals'
+      path: '/withdrawals'
+      fullPath: '/admin/withdrawals'
+      preLoaderRoute: typeof AdminWithdrawalsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/tournaments/$id': {
@@ -446,25 +542,33 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminAdvertisementsRoute: typeof AdminAdvertisementsRoute
+  AdminCategoriesRoute: typeof AdminCategoriesRoute
+  AdminCreditRoute: typeof AdminCreditRoute
+  AdminDepositsRoute: typeof AdminDepositsRoute
   AdminLeaderboardRoute: typeof AdminLeaderboardRoute
   AdminNotificationsRoute: typeof AdminNotificationsRoute
   AdminPaymentsRoute: typeof AdminPaymentsRoute
-  AdminRequestsRoute: typeof AdminRequestsRoute
   AdminResultsRoute: typeof AdminResultsRoute
   AdminTournamentsRoute: typeof AdminTournamentsRoute
+  AdminTransactionsRoute: typeof AdminTransactionsRoute
   AdminUsersRoute: typeof AdminUsersRoute
+  AdminWithdrawalsRoute: typeof AdminWithdrawalsRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAdvertisementsRoute: AdminAdvertisementsRoute,
+  AdminCategoriesRoute: AdminCategoriesRoute,
+  AdminCreditRoute: AdminCreditRoute,
+  AdminDepositsRoute: AdminDepositsRoute,
   AdminLeaderboardRoute: AdminLeaderboardRoute,
   AdminNotificationsRoute: AdminNotificationsRoute,
   AdminPaymentsRoute: AdminPaymentsRoute,
-  AdminRequestsRoute: AdminRequestsRoute,
   AdminResultsRoute: AdminResultsRoute,
   AdminTournamentsRoute: AdminTournamentsRoute,
+  AdminTransactionsRoute: AdminTransactionsRoute,
   AdminUsersRoute: AdminUsersRoute,
+  AdminWithdrawalsRoute: AdminWithdrawalsRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 
@@ -481,19 +585,10 @@ const rootRouteChildren: RootRouteChildren = {
   NotificationsRoute: NotificationsRoute,
   OnboardingRoute: OnboardingRoute,
   ReferRoute: ReferRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   WalletRoute: WalletRoute,
   TournamentsIdRoute: TournamentsIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

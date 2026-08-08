@@ -8,7 +8,6 @@ import {
 } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
 import { createProfileIfMissing, watchProfile } from "@/services/db";
 import type { UserProfile } from "@/lib/types";
 
@@ -18,7 +17,6 @@ interface AuthValue {
   loading: boolean;
   configured: boolean;
   isAdmin: boolean;
-  signInGoogle: () => Promise<void>;
   signInEmail: (email: string, password: string) => Promise<void>;
   signUpEmail: (name: string, email: string, password: string) => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
@@ -86,12 +84,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       loading,
       configured: true,
       isAdmin: profile?.role === "admin",
-      signInGoogle: async () => {
-        const result = await lovable.auth.signInWithOAuth("google", {
-          redirect_uri: window.location.origin,
-        });
-        if (result.error) throw result.error;
-      },
       signInEmail: async (email, password) => {
         check(await supabase.auth.signInWithPassword({ email, password }));
       },
@@ -110,7 +102,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       resetPassword: async (email) => {
         check(
           await supabase.auth.resetPasswordForEmail(email, {
-            redirectTo: `${window.location.origin}/auth`,
+            redirectTo: `${window.location.origin}/reset-password`,
           }),
         );
       },

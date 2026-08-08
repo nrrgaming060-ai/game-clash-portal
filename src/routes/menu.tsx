@@ -47,6 +47,7 @@ const schema = z.object({
     .string()
     .trim()
     .regex(/^[0-9+\-\s]{8,15}$/, "Enter a valid phone number"),
+  gameName: z.string().trim().min(2, "Enter your in-game name").max(30),
   gameUid: z.string().trim().min(4, "Game UID looks too short").max(30),
 });
 
@@ -59,12 +60,12 @@ const LINKS = [
 function MenuPage() {
   const { profile, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ name: "", phone: "", gameUid: "" });
+  const [form, setForm] = useState({ name: "", phone: "", gameName: "", gameUid: "" });
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     if (profile)
-      setForm({ name: profile.name, phone: profile.phone, gameUid: profile.gameUid });
+      setForm({ name: profile.name, phone: profile.phone, gameName: profile.gameName ?? "", gameUid: profile.gameUid });
   }, [profile?.uid]);
 
   if (!profile) return null;
@@ -165,6 +166,15 @@ function MenuPage() {
               value={form.phone}
               maxLength={15}
               onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="mgn">In-game name (IGN)</Label>
+            <Input
+              id="mgn"
+              value={form.gameName}
+              maxLength={30}
+              onChange={(e) => setForm((f) => ({ ...f, gameName: e.target.value }))}
             />
           </div>
           <div className="space-y-1.5">
