@@ -36,6 +36,7 @@ const schema = z.object({
     .string()
     .trim()
     .regex(/^[0-9+\-\s]{8,15}$/, "Enter a valid phone number"),
+  gameName: z.string().trim().min(2, "Enter your in-game name").max(30),
   gameUid: z.string().trim().min(4, "Game UID looks too short").max(30),
 });
 
@@ -59,7 +60,7 @@ function Onboarding() {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [busy, setBusy] = useState(false);
-  const [form, setForm] = useState({ name: "", phone: "", gameUid: "", referral: "" });
+  const [form, setForm] = useState({ name: "", phone: "", gameName: "", gameUid: "", referral: "" });
 
   useEffect(() => {
     if (profile) setForm((f) => ({ ...f, name: f.name || profile.name || "" }));
@@ -148,6 +149,16 @@ function Onboarding() {
           <div className="space-y-1.5">
             <Label htmlFor="p">Phone number</Label>
             <Input id="p" value={form.phone} onChange={set("phone")} maxLength={15} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="gn">In-game name (IGN)</Label>
+            <Input
+              id="gn"
+              value={form.gameName}
+              onChange={set("gameName")}
+              maxLength={30}
+              placeholder="e.g. ShadowSlayer"
+            />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="g">In-game player ID (UID)</Label>
